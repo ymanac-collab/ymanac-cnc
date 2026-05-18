@@ -508,36 +508,12 @@
       <h2>💳 Finalizar y pagar</h2>
       <p>Confirmá tu proyecto para habilitar el pago.</p>
       <div id="paymentForm" style="display:none;">
-        <form id="paymentFormEl" action="https://formsubmit.co/ymanac@gmail.com" method="POST" target="_blank" style="display:contents;">
-          <input type="hidden" name="_subject" value="🛠️ Nuevo presupuesto YMANAC CNC">
-          <input type="hidden" name="_next" value="https://ymanac-collab.github.io/ymanac-cnc/">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="Componentes (total)" id="hf_total">
-          <input type="hidden" name="Datos del cliente" id="hf_client">
-          <input type="hidden" name="Perfil" id="hf_perfil">
-          <input type="hidden" name="Componentes" id="hf_comps">
-          <input type="hidden" name="Hardware" id="hf_hw">
-          <input type="hidden" name="Curso CNC" id="hf_curso">
-          <input type="hidden" name="Garantía" id="hf_garantia">
-          <input type="hidden" name="Subtotal" id="hf_subtotal">
-          <input type="hidden" name="Mano de obra (30%)" id="hf_mo">
-          <input type="hidden" name="Envíos" id="hf_envios">
-          <input type="hidden" name="TOTAL" id="hf_total_final">
-          <input type="hidden" name="Tipo de cambio USD" id="hf_usd">
-          <input type="hidden" name="Método de pago" id="hf_pago">
-          <input type="hidden" name="Entrega" id="hf_entrega">
-          <input type="hidden" name="Dirección" id="hf_direccion">
-          <input type="hidden" name="Ciudad" id="hf_ciudad">
-          <input type="hidden" name="Teléfono" id="hf_telefono">
-          <input type="hidden" name="Tiempo de armado" id="hf_tiempo">
-          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:500px;margin:0 auto;">
-            <input type="text" name="Nombre" id="contactName" placeholder="Tu nombre" required style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
-            <input type="email" name="Email" id="contactEmail" placeholder="Tu email" required style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
-          </div>
-          <p style="color:#64748b;font-size:0.8rem;margin-top:10px;">Al enviar, te llega un resumen a tu email y a YMANAC para coordinar la entrega.</p>
-          <button type="submit" class="btn btn-success" style="margin-top:15px;" onclick="return prepForm()">📨 Enviar y pagar</button>
-        </form>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:500px;margin:0 auto;">
+          <input type="text" id="contactName" placeholder="Tu nombre" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
+          <input type="email" id="contactEmail" placeholder="Tu email" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
+        </div>
+        <p style="color:#64748b;font-size:0.8rem;margin-top:10px;">Al enviar, se abre tu correo con todos los datos del proyecto para enviar a YMANAC.</p>
+        <button class="btn btn-success" style="margin-top:15px;" onclick="enviarMail()">📨 Enviar por correo</button>
       </div>
     </div>
     <div class="nav-buttons">
@@ -1251,7 +1227,10 @@ function toggleConfirm() {
   document.querySelector('#ctaSection p').textContent = checked ? 'Completá tus datos para recibir el resumen y los datos de pago.' : 'Marcá la confirmación arriba para habilitar el pago.';
 }
 
-function prepForm() {
+function enviarMail() {
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  if (!name || !email) { alert('Completá tu nombre y email'); return; }
   const total = getTotal();
   const rate = parseFloat(document.getElementById('usdRate').value) || 1410;
   const hwARS = 40000;
@@ -1265,26 +1244,26 @@ function prepForm() {
   const matName = questions.material.find(m=>m.id===answers.material)?.name || '-';
   const sizeName = questions.size.find(s=>s.id===answers.size)?.name || '-';
   const useName = questions.use.find(u=>u.id===answers.use)?.name || '-';
-
-  document.getElementById('hf_total').value = fmt(total) + ` (USD ${Math.round(total/rate)})`;
-  document.getElementById('hf_client').value = document.getElementById('contactName').value + ' | ' + document.getElementById('contactEmail').value;
-  document.getElementById('hf_perfil').value = `${matName} · ${sizeName} · ${useName}`;
-  document.getElementById('hf_comps').value = compsList;
-  document.getElementById('hf_hw').value = fmt(hwARS);
-  document.getElementById('hf_curso').value = training ? fmt(45000) : 'No';
-  document.getElementById('hf_garantia').value = warranty === 'none' ? 'Sin garantía' : ({'6m':'6 meses (+15%)','1y':'1 año (+25%)','2y':'2 años (+40%)'})[warranty];
-  document.getElementById('hf_subtotal').value = fmt(subtotal);
-  document.getElementById('hf_mo').value = fmt(mo);
-  document.getElementById('hf_envios').value = fmt(envios);
-  document.getElementById('hf_total_final').value = fmt(grandTotal) + ` (USD ${Math.round(grandTotal/rate)})`;
-  document.getElementById('hf_usd').value = `1 USD = $${rate} ARS`;
-  document.getElementById('hf_pago').value = paymentMethod;
-  document.getElementById('hf_entrega').value = deliveryMode === 'pickup' ? 'Retiro en taller' : 'Envío a domicilio';
-  document.getElementById('hf_direccion').value = document.getElementById('delivAddress').value || '—';
-  document.getElementById('hf_ciudad').value = document.getElementById('delivCity').value || '—';
-  document.getElementById('hf_telefono').value = document.getElementById('delivPhone').value || '—';
-  document.getElementById('hf_tiempo').value = getBuildTime();
-  return true;
+  const body = encodeURIComponent(
+    `NUEVO PEDIDO - YMANAC CNC\n\n` +
+    `Cliente: ${name}\nEmail: ${email}\n\n` +
+    `Perfil: ${matName} / ${sizeName} / ${useName}\n\n` +
+    `Componentes:\n${compsList}\n` +
+    `Hardware: ${fmt(hwARS)}\n` +
+    `Curso CNC: ${training ? fmt(45000) : 'No'}\n` +
+    `Garantía: ${warranty === 'none' ? 'Sin garantía' : ({'6m':'6 meses','1y':'1 año','2y':'2 años'})[warranty]}\n\n` +
+    `Subtotal: ${fmt(subtotal)}\n` +
+    `Mano de obra (30%): ${fmt(mo)}\n` +
+    `Envíos: ${fmt(envios)}\n` +
+    `TOTAL: ${fmt(grandTotal)} (USD ${Math.round(grandTotal/rate)})\n\n` +
+    `Pago: ${paymentMethod}\n` +
+    `Entrega: ${deliveryMode === 'pickup' ? 'Retiro en taller' : 'Envío a domicilio'}\n` +
+    `Dirección: ${document.getElementById('delivAddress').value || '—'}\n` +
+    `Ciudad: ${document.getElementById('delivCity').value || '—'}\n` +
+    `Teléfono: ${document.getElementById('delivPhone').value || '—'}\n` +
+    `Tiempo armado: ${getBuildTime()}`
+  );
+  window.open(`mailto:ymanac@gmail.com?subject=${encodeURIComponent('🛠️ Nuevo pedido YMANAC CNC - ' + name)}&body=${body}`, '_blank');
 }
 
 function getBuildTime() {

@@ -513,8 +513,8 @@
           <input type="text" id="contactName" placeholder="Tu nombre" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
           <input type="email" id="contactEmail" placeholder="Tu email" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
         </div>
-        <p style="color:#64748b;font-size:0.8rem;margin-top:10px;">Se abre tu correo con el presupuesto listo para enviar. Te llega a vos (CC a YMANAC). Solo tocá "Enviar".</p>
-        <button class="btn btn-success" style="margin-top:15px;" onclick="enviarMail()">📨 Enviar por correo</button>
+        <div id="mailStatus" style="font-size:0.8rem;color:#10b981;margin-bottom:8px;display:none;">✅ Presupuesto enviado. Te va a llegar a tu mail y a YMANAC.</div>
+        <button class="btn btn-success" style="margin-top:15px;" onclick="enviarMail()" id="sendBtn">📨 Enviar presupuesto</button>
       </div>
     </div>
     <div class="nav-buttons">
@@ -1235,8 +1235,8 @@ function enviarMail() {
   const email = document.getElementById('contactEmail').value.trim();
   if (!name || !email) { alert('Completá tu nombre y email'); return; }
   mailSent = true;
-  document.querySelector('#paymentForm .btn-success').textContent = '✅ Enviado';
-  document.querySelector('#paymentForm .btn-success').disabled = true;
+  document.getElementById('sendBtn').textContent = '⏳ Enviando...';
+  document.getElementById('sendBtn').disabled = true;
   const total = getTotal();
   const rate = parseFloat(document.getElementById('usdRate').value) || 1410;
   const hwARS = 40000;
@@ -1250,26 +1250,31 @@ function enviarMail() {
   const matName = questions.material.find(m=>m.id===answers.material)?.name || '-';
   const sizeName = questions.size.find(s=>s.id===answers.size)?.name || '-';
   const useName = questions.use.find(u=>u.id===answers.use)?.name || '-';
-  const body = encodeURIComponent(
-    `NUEVO PEDIDO - YMANAC CNC\n\n` +
-    `Cliente: ${name}\nEmail: ${email}\n\n` +
-    `Perfil: ${matName} / ${sizeName} / ${useName}\n\n` +
-    `Componentes:\n${compsList}\n` +
-    `Hardware: ${fmt(hwARS)}\n` +
-    `Curso CNC: ${training ? fmt(45000) : 'No'}\n` +
-    `Garantía: ${warranty === 'none' ? 'Sin garantía' : ({'6m':'6 meses','1y':'1 año','2y':'2 años'})[warranty]}\n\n` +
-    `Subtotal: ${fmt(subtotal)}\n` +
-    `Mano de obra (30%): ${fmt(mo)}\n` +
-    `Envíos: ${fmt(envios)}\n` +
-    `TOTAL: ${fmt(grandTotal)} (USD ${Math.round(grandTotal/rate)})\n\n` +
-    `Pago: ${paymentMethod}\n` +
-    `Entrega: ${deliveryMode === 'pickup' ? 'Retiro en taller' : 'Envío a domicilio'}\n` +
-    `Dirección: ${document.getElementById('delivAddress').value || '—'}\n` +
-    `Ciudad: ${document.getElementById('delivCity').value || '—'}\n` +
-    `Teléfono: ${document.getElementById('delivPhone').value || '—'}\n` +
-    `Tiempo armado: ${getBuildTime()}`
-  );
-   window.open(`mailto:${encodeURIComponent(email)}?cc=ymanac@gmail.com&subject=${encodeURIComponent('🛠️ Tu presupuesto YMANAC CNC - ' + name)}&body=${body}`, '_blank');
+  const entregaDir = document.getElementById('delivAddress').value || '—';
+  const entregaCiudad = document.getElementById('delivCity').value || '—';
+  const entregaTel = document.getElementById('delivPhone').value || '—';
+  const cuerpo = `Cliente: ${name}\nEmail: ${email}\n\nPerfil: ${matName} / ${sizeName} / ${useName}\n\nComponentes:\n${compsList}\nHardware: ${fmt(hwARS)}\nCurso CNC: ${training ? fmt(45000) : 'No'}\nGarantía: ${warranty === 'none' ? 'Sin garantía' : ({'6m':'6 meses','1y':'1 año','2y':'2 años'})[warranty]}\n\nSubtotal: ${fmt(subtotal)}\nMO (30%): ${fmt(mo)}\nEnvíos: ${fmt(envios)}\nTOTAL: ${fmt(grandTotal)} (USD ${Math.round(grandTotal/rate)})\n\nPago: ${paymentMethod}\nEntrega: ${deliveryMode === 'pickup' ? 'Retiro en taller' : 'Envío a domicilio'}\nDirección: ${entregaDir}\nCiudad: ${entregaCiudad}\nTeléfono: ${entregaTel}\nTiempo armado: ${getBuildTime()}`;
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      access_key: '3c342011-0261-4815-ad59-073268662790',
+      subject: '🛠️ Nuevo presupuesto YMANAC CNC - ' + name,
+      name: name,
+      email: email,
+      message: cuerpo,
+      from_name: 'YMANAC CNC',
+      replyto: email
+    })
+  }).then(r => r.json()).then(() => {
+    document.getElementById('sendBtn').textContent = '✅ Enviado';
+    document.getElementById('mailStatus').style.display = 'block';
+  }).catch(() => {
+    document.getElementById('sendBtn').textContent = '❌ Error';
+    document.getElementById('sendBtn').disabled = false;
+    mailSent = false;
+    alert('Error al enviar. Probá de nuevo.');
+  });
 }
 
 function getBuildTime() {

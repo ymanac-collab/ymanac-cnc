@@ -1228,10 +1228,15 @@ function toggleConfirm() {
   document.querySelector('#ctaSection p').textContent = checked ? 'Completá tus datos para recibir el resumen y los datos de pago.' : 'Marcá la confirmación arriba para habilitar el pago.';
 }
 
+let mailSent = false;
 function enviarMail() {
+  if (mailSent) return;
   const name = document.getElementById('contactName').value.trim();
   const email = document.getElementById('contactEmail').value.trim();
   if (!name || !email) { alert('Completá tu nombre y email'); return; }
+  mailSent = true;
+  document.querySelector('#paymentForm .btn-success').textContent = '✅ Enviado';
+  document.querySelector('#paymentForm .btn-success').disabled = true;
   const total = getTotal();
   const rate = parseFloat(document.getElementById('usdRate').value) || 1410;
   const hwARS = 40000;

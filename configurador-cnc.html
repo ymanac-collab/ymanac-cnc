@@ -356,7 +356,8 @@ function renderNav() {
   document.querySelectorAll('.step-screen').forEach(el => el.classList.remove('active'));
   if (currentStep < CATEGORIES.length) {
     document.getElementById('screen' + currentStep).classList.add('active');
-    document.getElementById('summaryScreen').classList.remove('active');
+  } else {
+    document.getElementById('summaryScreen').classList.add('active');
   }
 }
 

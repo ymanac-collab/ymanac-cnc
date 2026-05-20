@@ -385,6 +385,7 @@ function toggleMoneda() {
 
 function loginAdmin() {
   if (isAdmin) {
+    if (document.getElementById('adminPanelModal').classList.contains('open')) saveAdminPrices();
     isAdmin = false;
     document.getElementById('adminBtn').textContent = '🔐 Admin';
     document.getElementById('panelBtn').style.display = 'none';

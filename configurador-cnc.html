@@ -63,6 +63,13 @@
   .nav-buttons { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
   .nav-buttons .spacer { flex: 1; }
   .btn { padding: 10px 22px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 6px; }
+  .presets { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .preset-card { flex: 1; min-width: 160px; background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 12px; cursor: pointer; transition: all 0.25s ease; }
+  .preset-card:hover { border-color: #58a6ff; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+  .preset-card .p-name { font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+  .preset-card .p-area { font-size: 0.65rem; color: #8b949e; margin-top: 2px; }
+  .preset-card .p-price { font-size: 0.75rem; color: #58a6ff; margin-top: 4px; font-weight: bold; }
+  .preset-card .p-tier { font-size: 0.55rem; padding: 1px 8px; border-radius: 8px; display: inline-block; }
   .btn:hover { transform: translateY(-2px); }
   .btn:active { transform: translateY(0); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -83,6 +90,8 @@
     <button onclick="toggleMoneda()" id="monedaBtn">💵 ARS</button>
     <button onclick="openAdminPanel()" id="panelBtn" style="display:none;">💰 Admin Precios</button>
   </div>
+
+  <div class="presets" id="presetsBar"></div>
 
   <div class="step-nav" id="stepNav"></div>
 
@@ -159,6 +168,12 @@ const ADMIN_PASS = 'ymanac2026';
 const CATEGORIES = ['motor','driver','psu','trans','linear','frame','spindle','ctrl'];
 const CAT_LABELS = { motor:'Motor', driver:'Driver', psu:'Fuente', trans:'Transmisión', linear:'Guías Lineales', frame:'Estructura', spindle:'Husillo/Spindle', ctrl:'Controlador' };
 const CAT_ICONS = { motor:'🔧', driver:'⚡', psu:'🔌', trans:'⛓️', linear:'📏', frame:'🏗️', spindle:'🔄', ctrl:'💻' };
+
+const PRESETS = [
+  { id:'alfa', name:'Alfa', icon:'🔵', area:'1300 × 1830 mm (½ placa)', tier:4, desc:'CNC grande profesional', comps:{ motor:'n23-2.0', driver:'dm542', psu:'48v', trans:'ball', linear:'hgr15', frame:'3060', spindle:'2200w', ctrl:'linuxcnc' } },
+  { id:'exilon', name:'Exilon', icon:'🟢', area:'1300 × 915 mm (¼ placa)', tier:3, desc:'CNC mediano taller', comps:{ motor:'n23-1.2', driver:'tb6600', psu:'24v', trans:'lead', linear:'mgn12', frame:'2080', spindle:'1500w', ctrl:'mach3' } },
+  { id:'gama-mini', name:'Gama Mini', icon:'🟡', area:'300 × 300 mm', tier:1, desc:'Mini CNC escritorio', comps:{ motor:'n17-0.4', driver:'a4988', psu:'12v', trans:'belt', linear:'vwheel', frame:'2020', spindle:'500w', ctrl:'grbl' } },
+];
 
 const BASE_DATA = {
   motor: [
@@ -317,8 +332,45 @@ function init() {
       </div>
     </div>
   `).join('');
+  renderPresets();
   renderNav();
   renderScreen();
+}
+
+function renderPresets() {
+  const data = getData();
+  const bar = document.getElementById('presetsBar');
+  bar.innerHTML = PRESETS.map(p => {
+    let total = 0;
+    let ok = true;
+    for (const [cat, id] of Object.entries(p.comps)) {
+      const item = data[cat]?.find(i => i.id === id);
+      if (!item) { ok = false; break; }
+      total += item.price;
+    }
+    const col = ['','#3fb950','#d29922','#f78166','#da3633','#8957e5'][p.tier] || '#3fb950';
+    const tierLbl = ['','Básico','Económico','Medio','Avanzado','Profesional'][p.tier] || '';
+    return `<div class="preset-card" onclick="selectPreset('${p.id}')">
+      <div class="p-name"><span>${p.icon}</span> ${p.name} <span class="p-tier" style="background:${col};">${tierLbl}</span></div>
+      <div class="p-area">${p.area} · ${p.desc}</div>
+      <div class="p-price">${fmtP(total)}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectPreset(id) {
+  const p = PRESETS.find(x => x.id === id);
+  if (!p) return;
+  selected = {};
+  for (const [cat, id] of Object.entries(p.comps)) {
+    selected[cat] = id;
+  }
+  currentStep = CATEGORIES.length;
+  document.querySelectorAll('.step-screen').forEach(el => el.classList.remove('active'));
+  document.getElementById('summaryScreen').classList.add('active');
+  renderSummary();
+  renderNav();
+  renderPresets();
 }
 
 function renderScreen() {

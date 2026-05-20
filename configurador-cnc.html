@@ -46,16 +46,19 @@
   .login-screen input { width: 100%; padding: 10px; margin-bottom: 8px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; }
   .login-screen button { width: 100%; }
 
-  .admin-panel { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 20px; max-height: 80vh; overflow-y: auto; }
+  .admin-panel { background: #161b22; border: none; border-radius: 12px; padding: 25px; width: 100%; }
   .admin-panel h2 { color: #58a6ff; font-size: 1rem; margin-bottom: 15px; text-align: center; }
   .admin-panel h3 { color: #c9d1d9; font-size: 0.85rem; margin: 15px 0 8px; padding-bottom: 5px; border-bottom: 1px solid #21262d; display: flex; align-items: center; gap: 6px; }
   .admin-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-bottom: 1px solid #0d1117; font-size: 0.8rem; }
   .admin-row .ar-name { flex: 1; color: #c9d1d9; }
   .admin-row .ar-tier { font-size: 0.6rem; padding: 1px 6px; border-radius: 6px; color: #0d1117; font-weight: bold; min-width: 28px; text-align: center; }
-  .admin-row .ar-price { width: 120px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; text-align: right; }
+  .admin-row .ar-price { width: 140px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; text-align: right; }
   .admin-row .ar-price:focus { outline: none; border-color: #58a6ff; }
   .admin-row .ar-unit { color: #8b949e; font-size: 0.7rem; min-width: 30px; }
   .admin-panel .btn-row { display: flex; gap: 8px; justify-content: center; margin-top: 15px; }
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-overlay .modal { width: 95vw; max-width: 1000px; max-height: 90vh; overflow: auto; background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 0; }
 </style>
 </head>
 <body>
@@ -101,7 +104,7 @@
 
 <!-- MODAL PANEL ADMIN -->
 <div class="modal-overlay" id="adminPanelModal" onclick="closeAdminPanel()">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:800px;">
+  <div class="modal" onclick="event.stopPropagation()">
     <div class="admin-panel" id="adminPanelBody"></div>
   </div>
 </div>

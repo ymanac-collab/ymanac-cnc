@@ -108,10 +108,43 @@
       <div class="summary-total" id="totalPrice">$0</div>
       <div style="text-align:center;font-size:0.7rem;color:#484f58;">Total final (componentes + MO + envíos)</div>
       <div class="bom" id="bom"></div>
-      <button class="btn btn-secondary" style="width:100%;margin-top:10px;" onclick="resetAll()">🔄 Reiniciar</button>
+      <button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="showRecibo()">📄 Generar recibo de seña</button>
+      <button class="btn btn-secondary" style="width:100%;margin-top:6px;" onclick="resetAll()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div id="reciboScreen" class="step-screen">
+    <div class="screen-card">
+      <h2>📄 Recibo de seña — YMANAC CNC</h2>
+      <div style="margin-top:12px;">
+        <label style="font-size:0.8rem;color:#8b949e;">Cliente</label>
+        <input id="recCliente" class="rec-input" placeholder="Nombre y apellido">
+        <label style="font-size:0.8rem;color:#8b949e;">DNI / CUIL</label>
+        <input id="recDni" class="rec-input" placeholder="DNI o CUIL">
+        <label style="font-size:0.8rem;color:#8b949e;">Teléfono</label>
+        <input id="recTel" class="rec-input" placeholder="Teléfono / WhatsApp">
+        <label style="font-size:0.8rem;color:#8b949e;">Seña pagada ($)</label>
+        <input id="recMonto" class="rec-input" type="number" min="0" step="100" placeholder="Ej: 50000">
+        <label style="font-size:0.8rem;color:#8b949e;">Firma del cliente</label>
+        <canvas id="sigCanvas" width="500" height="150" style="width:100%;height:100px;background:#0d1117;border:1px solid #30363d;border-radius:6px;cursor:crosshair;touch-action:none;"></canvas>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="btn btn-secondary" onclick="clearSig()">🗑 Borrar firma</button>
+        </div>
+        <div class="btn-row" style="margin-top:15px;">
+          <button class="btn btn-secondary" onclick="hideRecibo()">← Volver</button>
+          <button class="btn btn-primary" onclick="genPDF()">📄 Generar PDF</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+.rec-input { width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid #30363d; color:#c9d1d9; border-radius:6px; font-size:0.9rem; }
+.rec-input:focus { outline:none; border-color:#58a6ff; }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- MODAL PANEL ADMIN -->
 <div class="modal-overlay" id="adminPanelModal" onclick="closeAdminPanel()">
@@ -488,6 +521,214 @@ function importPrices(ev) {
     }
   };
   reader.readAsText(file);
+}
+
+let sigData = null;
+
+function showRecibo() {
+  document.querySelectorAll('.step-screen').forEach(el => el.classList.remove('active'));
+  document.getElementById('reciboScreen').classList.add('active');
+  document.getElementById('navButtons').style.display = 'none';
+  setupSig();
+}
+
+function hideRecibo() {
+  document.getElementById('reciboScreen').classList.remove('active');
+  document.getElementById('summaryScreen').classList.add('active');
+  document.getElementById('navButtons').style.display = '';
+}
+
+function setupSig() {
+  const c = document.getElementById('sigCanvas');
+  c.width = c.offsetWidth * 2;
+  c.height = c.offsetHeight * 2;
+  const ctx = c.getContext('2d');
+  ctx.scale(2, 2);
+  ctx.strokeStyle = '#58a6ff';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  let drawing = false;
+  function start(e) { drawing = true; const p = pos(e, c); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+  function move(e) { if (!drawing) return; const p = pos(e, c); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+  function end() { drawing = false; sigData = c.toDataURL(); }
+  function pos(e, el) {
+    const r = el.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: (t.clientX - r.left), y: (t.clientY - r.top) };
+  }
+  c.onmousedown = start; c.onmousemove = move; c.onmouseup = end; c.onmouseleave = end;
+  c.ontouchstart = start; c.ontouchmove = move; c.ontouchend = end;
+}
+
+function clearSig() {
+  const c = document.getElementById('sigCanvas');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  sigData = null;
+}
+
+function genPDF() {
+  const nom = document.getElementById('recCliente').value.trim();
+  const dni = document.getElementById('recDni').value.trim();
+  const tel = document.getElementById('recTel').value.trim();
+  const seña = parseFloat(document.getElementById('recMonto').value) || 0;
+  if (!nom) { alert('Ingresá el nombre del cliente'); return; }
+  if (seña <= 0) { alert('Ingresá el monto de la seña'); return; }
+
+  const data = getData();
+  const total = getTotal();
+  const laborPct = parseFloat(document.getElementById('laborPct').value) || 0;
+  const shipPerItem = parseFloat(document.getElementById('shipCost').value) || 0;
+  const bom = [];
+  for (const [cat, id] of Object.entries(selected)) {
+    const item = data[cat]?.find(i => i.id === id);
+    if (item) bom.push({ cat: CAT_LABELS[cat], name: item.name, price: item.price });
+  }
+  const laborCost = Math.round(total * laborPct / 100);
+  const shipCost = Math.round(bom.length * shipPerItem);
+  const grandTotal = total + laborCost + shipCost;
+  const saldo = grandTotal - seña;
+  const fecha = new Date().toLocaleDateString('es-AR');
+  const nro = Math.floor(Math.random() * 9000) + 1000;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const w = 190;
+  let y = 15;
+
+  function txt(s, x, sz, opt) { doc.setFontSize(sz || 10); doc.text(s, x, y, opt || {}); }
+
+  doc.setFillColor(10, 17, 23);
+  doc.rect(0, 0, 210, 297, 'F');
+  doc.setTextColor(201, 209, 217);
+
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(88, 166, 255);
+  txt('YMANAC CNC', w / 2, 16, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setTextColor(139, 148, 158);
+  txt('www.ymanac-cnc.com.ar  |  WhatsApp: 1128895177', w / 2, 22, { align: 'center' });
+  y = 30;
+
+  doc.setDrawColor(48, 54, 61);
+  doc.line(10, y, 200, y);
+  y += 6;
+
+  doc.setFontSize(13);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(88, 166, 255);
+  txt('RECIBO DE SEÑA N° ' + nro, w / 2, y, { align: 'center' });
+  y += 8;
+  doc.setFontSize(9);
+  doc.setTextColor(139, 148, 158);
+  txt('Fecha: ' + fecha, 10, y);
+  y += 6;
+
+  doc.setDrawColor(48, 54, 61);
+  doc.line(10, y, 200, y);
+  y += 8;
+
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(201, 209, 217);
+  txt('DATOS DEL CLIENTE', 10, y);
+  y += 7;
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  txt('Nombre: ' + nom, 15, y); y += 6;
+  txt('DNI/CUIL: ' + (dni || '-'), 15, y); y += 6;
+  txt('Teléfono: ' + (tel || '-'), 15, y); y += 6;
+
+  doc.setDrawColor(48, 54, 61);
+  doc.line(10, y, 200, y);
+  y += 8;
+
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(201, 209, 217);
+  txt('MÁQUINA CONFIGURADA', 10, y);
+  y += 7;
+  doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
+  doc.setTextColor(139, 148, 158);
+  for (const b of bom) {
+    txt(b.cat + ': ' + b.name, 15, y);
+    y += 5;
+    if (y > 270) { doc.addPage(); y = 15; }
+  }
+
+  y += 3;
+  doc.setDrawColor(48, 54, 61);
+  doc.line(10, y, 200, y);
+  y += 8;
+
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(201, 209, 217);
+  txt('RESUMEN ECONÓMICO', 10, y);
+  y += 7;
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  doc.setTextColor(139, 148, 158);
+  const lines = [
+    ['Total componentes:', '$' + total.toLocaleString('es-AR')],
+    ['Mano de obra (' + laborPct + '%):', '$' + laborCost.toLocaleString('es-AR')],
+    ['Envío (' + bom.length + ' items):', '$' + shipCost.toLocaleString('es-AR')],
+    ['', ''],
+    ['TOTAL', '$' + grandTotal.toLocaleString('es-AR')],
+    ['Seña pagada', '$' + seña.toLocaleString('es-AR')],
+    ['Saldo pendiente', '$' + saldo.toLocaleString('es-AR')],
+  ];
+  for (const l of lines) {
+    if (l[0] === 'TOTAL' || l[0] === 'Saldo pendiente') {
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(88, 166, 255);
+    } else if (l[0] === 'Seña pagada') {
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(63, 185, 80);
+    } else {
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(139, 148, 158);
+    }
+    if (l[0] === '') { y += 1; continue; }
+    txt(l[0], 15, y);
+    txt(l[1], 190, y, { align: 'right' });
+    y += 6;
+  }
+
+  y += 5;
+  doc.setDrawColor(48, 54, 61);
+  doc.line(10, y, 200, y);
+  y += 8;
+
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.setTextColor(201, 209, 217);
+  txt('FIRMAS', 10, y);
+  y += 10;
+
+  doc.setFontSize(9);
+  doc.setFont(undefined, 'normal');
+  doc.setTextColor(139, 148, 158);
+  doc.line(15, y, 80, y);
+  txt('Cliente: ' + nom, 15, y - 2);
+  if (sigData) {
+    const imgW = 60;
+    const imgH = 20;
+    doc.addImage(sigData, 'PNG', w - 80, y - 12, imgW, imgH);
+  }
+  y += 10;
+  doc.line(15, y, 80, y);
+  txt('YMANAC CNC', 15, y - 2);
+
+  y += 15;
+  doc.setFontSize(7);
+  doc.setTextColor(48, 54, 61);
+  doc.setFont(undefined, 'italic');
+  txt('Documento no válido como factura. Recibo de seña por compra de máquina CNC.', w / 2, y, { align: 'center' });
+
+  doc.save('recibo-seña-ymanac-n' + nro + '.pdf');
 }
 
 init();

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurador CNC - Armado Progresivo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 15px; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { text-align: center; color: #58a6ff; margin-bottom: 4px; font-size: 1.3rem; }
+  .subtitle { text-align: center; color: #8b949e; margin-bottom: 15px; font-size: 0.8rem; }
+  .admin-bar { display: flex; justify-content: flex-end; margin-bottom: 10px; gap: 6px; }
+  .admin-bar button { background: #21262d; color: #8b949e; border: 1px solid #30363d; padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; cursor: pointer; }
+  .admin-bar button:hover { background: #30363d; color: #c9d1d9; }
+  .step-nav { display: flex; gap: 4px; margin-bottom: 12px; background: #161b22; border-radius: 8px; padding: 8px; border: 1px solid #21262d; overflow-x: auto; flex-wrap: wrap; }
+  .step-dot { display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: #0d1117; border-radius: 6px; font-size: 0.7rem; color: #484f58; white-space: nowrap; cursor: pointer; }
+  .step-dot.active { color: #58a6ff; border: 1px solid #58a6ff; }
+  .step-dot.done { color: #3fb950; }
+  .step-dot .num { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; background: #21262d; color: #484f58; }
+  .step-dot.done .num { background: #3fb950; color: #0d1117; }
+  .step-dot.active .num { background: #58a6ff; color: #0d1117; }
+  .step-screen { display: none; }
+  .step-screen.active { display: block; }
+  .screen-card { background: #161b22; border-radius: 10px; padding: 20px; border: 1px solid #21262d; }
+  .screen-card h2 { font-size: 0.95rem; color: #58a6ff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .screen-card .hint { font-size: 0.75rem; color: #8b949e; margin-bottom: 12px; }
+  .comp-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .comp-card { flex: 1; min-width: 130px; background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
+  .comp-card:hover { border-color: #58a6ff; }
+  .comp-card.selected { border-color: #58a6ff; background: #0d1117; box-shadow: 0 0 0 1px #58a6ff; }
+  .comp-card.incompatible { opacity: 0.35; cursor: not-allowed; }
+  .comp-card .name { font-size: 0.8rem; font-weight: bold; color: #c9d1d9; padding-right: 40px; }
+  .comp-card .specs { font-size: 0.65rem; color: #8b949e; margin-top: 3px; line-height: 1.3; }
+  .comp-card .price { font-size: 0.7rem; color: #58a6ff; margin-top: 4px; }
+  .comp-card .tier { position: absolute; top: 5px; right: 5px; font-size: 0.55rem; padding: 1px 6px; border-radius: 8px; }
+  .tier-1 { background: #3fb950; color: #0d1117; }
+  .tier-2 { background: #d29922; color: #0d1117; }
+  .tier-3 { background: #f78166; color: #0d1117; }
+  .tier-4 { background: #da3633; color: #fff; }
+  .tier-5 { background: #8957e5; color: #fff; }
+  .comp-card .edit-price { position: absolute; top: 5px; left: 5px; font-size: 0.6rem; color: #58a6ff; cursor: pointer; background: #0d1117; border: 1px solid #21262d; border-radius: 4px; padding: 1px 5px; display: none; }
+  .comp-card .edit-price:hover { background: #21262d; }
+  .admin-mode .comp-card .edit-price { display: block; }
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 15px; gap: 10px; }
+  .nav-buttons .spacer { flex: 1; }
+  .btn { padding: 10px 28px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border: none; }
+  .btn-primary { background: #238636; color: #fff; }
+  .btn-primary:hover { background: #2ea043; }
+  .btn-secondary { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+  .btn-secondary:hover { background: #30363d; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-danger { background: #da3633; color: #fff; }
+  .btn-danger:hover { background: #f85149; }
+  .summary-box { background: #161b22; border-radius: 10px; padding: 20px; border: 1px solid #21262d; margin-top: 10px; }
+  .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.8rem; border-bottom: 1px solid #21262d; }
+  .summary-total { font-size: 1.5rem; font-weight: bold; color: #58a6ff; text-align: center; padding: 12px 0; }
+  .summary-nivel { text-align: center; font-size: 0.85rem; color: #8b949e; margin: 8px 0; }
+  .nivel-bar { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+  .nivel-fill { height: 100%; border-radius: 4px; transition: 0.3s; }
+  .lab-ship { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .lab-ship label { font-size: 0.75rem; color: #8b949e; display: block; margin-bottom: 3px; }
+  .lab-ship input { width: 100%; padding: 6px 8px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 4px; font-size: 0.8rem; }
+  .lab-ship input:focus { outline: none; border-color: #58a6ff; }
+  .bom { margin-top: 8px; }
+  .bom-item { font-size: 0.75rem; color: #8b949e; padding: 2px 0; }
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; width: 340px; max-width: 90vw; }
+  .modal h3 { color: #c9d1d9; font-size: 0.95rem; margin-bottom: 12px; }
+  .modal label { color: #8b949e; font-size: 0.75rem; display: block; margin-bottom: 4px; }
+  .modal input, .modal select { width: 100%; padding: 8px 10px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; font-size: 0.85rem; margin-bottom: 10px; }
+  .modal input:focus { outline: none; border-color: #58a6ff; }
+  .modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal .btn-row button { padding: 8px 16px; }
+
+  .login-screen { max-width: 340px; margin: 40px auto; }
+  .login-screen h2 { color: #58a6ff; text-align: center; margin-bottom: 15px; font-size: 1.1rem; }
+  .login-screen input { width: 100%; padding: 10px; margin-bottom: 8px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; }
+  .login-screen button { width: 100%; }
+
+  .price-toggle { display: flex; gap: 4px; background: #0d1117; border-radius: 6px; padding: 3px; border: 1px solid #21262d; }
+  .price-toggle button { padding: 4px 12px; border: none; border-radius: 4px; font-size: 0.7rem; cursor: pointer; background: transparent; color: #8b949e; }
+  .price-toggle button.active { background: #238636; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>⚙ Configurador CNC</h1>
+  <p class="subtitle">Paso a paso — Armá tu CNC compatible</p>
+
+  <div class="admin-bar">
+    <button onclick="toggleAdmin()" id="adminBtn">🔐 Admin</button>
+    <button onclick="toggleMoneda()" id="monedaBtn">💵 ARS</button>
+  </div>
+
+  <div class="step-nav" id="stepNav"></div>
+
+  <div id="screens"></div>
+
+  <div class="nav-buttons" id="navButtons">
+    <button class="btn btn-secondary" onclick="prevStep()" id="btnPrev">← Atrás</button>
+    <span class="spacer"></span>
+    <button class="btn btn-primary" onclick="nextStep()" id="btnNext">Siguiente →</button>
+  </div>
+
+  <div id="summaryScreen" class="step-screen">
+    <div class="summary-box">
+      <h2 style="color:#58a6ff;font-size:1rem;margin-bottom:10px;">📋 Resumen final</h2>
+      <div id="summaryItems"></div>
+      <div class="lab-ship">
+        <div><label>✋ Mano de obra (%)</label><input type="number" id="laborPct" value="30" min="0" max="200" onchange="renderSummary()"></div>
+        <div><label>🚚 Envío por item ($)</label><input type="number" id="shipCost" value="8000" min="0" step="500" onchange="renderSummary()"></div>
+      </div>
+      <div class="nivel-bar"><div class="nivel-fill" id="nivelFill" style="width:0%;background:#3fb950;"></div></div>
+      <div class="summary-nivel" id="nivelLabel">🟢 Nivel: —</div>
+      <div id="subtotals" style="font-size:0.75rem;color:#8b949e;text-align:center;padding:4px 0;"></div>
+      <div class="summary-total" id="totalPrice">$0</div>
+      <div style="text-align:center;font-size:0.7rem;color:#484f58;">Total final (componentes + MO + envíos)</div>
+      <div class="bom" id="bom"></div>
+      <button class="btn btn-secondary" style="width:100%;margin-top:10px;" onclick="resetAll()">🔄 Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRECIO -->
+<div class="modal-overlay" id="priceModal" onclick="closePriceModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="pmTitle">Editar precio</h3>
+    <label>Componente</label>
+    <input id="pmCompName" readonly style="opacity:0.7;">
+    <label>Precio unitario (<span id="pmMonedaLabel">ARS</span>)</label>
+    <input type="number" id="pmPrice" min="0" step="100">
+    <label>Moneda</label>
+    <select id="pmCurrency">
+      <option value="ARS">ARS</option>
+      <option value="USD">USD</option>
+    </select>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closePriceModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePriceEdit()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'ymanac2026';
+const CATEGORIES = ['motor','driver','psu','trans','linear','frame','spindle','ctrl'];
+const CAT_LABELS = { motor:'Motor', driver:'Driver', psu:'Fuente', trans:'Transmisión', linear:'Guías Lineales', frame:'Estructura', spindle:'Husillo/Spindle', ctrl:'Controlador' };
+const CAT_ICONS = { motor:'🔧', driver:'⚡', psu:'🔌', trans:'⛓️', linear:'📏', frame:'🏗️', spindle:'🔄', ctrl:'💻' };
+
+const BASE_DATA = {
+  motor: [
+    { id: 'n17-0.4', name: 'NEMA 17 0.4Nm', tier: 1, price: 15000, specs: '200 pasos · 1.2A · 42mm', compat: { driver: ['a4988','drv8825','tb6600'], psu: ['12v','24v'], frame: ['2020','2040'], trans: ['belt','lead'], linear: ['vwheel','bush','mgn7','mgn9'], spindle: ['500w','800w','1500w'], ctrl: ['grbl'] } },
+    { id: 'n17-0.5', name: 'NEMA 17 0.5Nm', tier: 2, price: 22000, specs: '200 pasos · 2A · 42x48mm', compat: { driver: ['a4988','drv8825','tb6600','dm542'], psu: ['12v','24v'], frame: ['2020','2040'], trans: ['belt','lead','ball'], linear: ['vwheel','bush','mgn7','mgn9','mgn12'], spindle: ['500w','800w','1500w'], ctrl: ['grbl'] } },
+    { id: 'n23-1.2', name: 'NEMA 23 1.2Nm', tier: 2, price: 32000, specs: '200 pasos · 3A · 57mm', compat: { driver: ['tb6600','dm542'], psu: ['24v','36v'], frame: ['2040','2080'], trans: ['belt','lead','ball','rack'], linear: ['mgn9','mgn12','hgr15'], spindle: ['800w','1500w','2200w'], ctrl: ['grbl','mach3'] } },
+    { id: 'n23-2.0', name: 'NEMA 23 2.0Nm', tier: 3, price: 42000, specs: '200 pasos · 4A · 57x76mm', compat: { driver: ['tb6600','dm542'], psu: ['24v','36v','48v'], frame: ['2040','2080','3060'], trans: ['belt','lead','ball','rack'], linear: ['mgn12','hgr15','hgr20'], spindle: ['1500w','2200w','3000w'], ctrl: ['grbl','mach3','linuxcnc'] } },
+    { id: 'n23-3.0', name: 'NEMA 23 3.0Nm', tier: 4, price: 58000, specs: '200 pasos · 4.2A · 57x112mm', compat: { driver: ['dm542','dm860'], psu: ['36v','48v','60v'], frame: ['2080','3060'], trans: ['ball','rack'], linear: ['hgr15','hgr20','hgr25'], spindle: ['2200w','3000w'], ctrl: ['mach3','linuxcnc'] } },
+    { id: 'n34-4.5', name: 'NEMA 34 4.5Nm', tier: 4, price: 90000, specs: '200 pasos · 5.6A · 86mm', compat: { driver: ['dm860','dm2280'], psu: ['48v','60v','80v'], frame: ['3060'], trans: ['ball','rack'], linear: ['hgr20','hgr25','hgr30'], spindle: ['2200w','3000w','4500w'], ctrl: ['linuxcnc','mach3'] } },
+    { id: 'n34-8.0', name: 'NEMA 34 8.0Nm', tier: 5, price: 145000, specs: '200 pasos · 6A · 86x118mm', compat: { driver: ['dm860','dm2280'], psu: ['60v','80v'], frame: ['3060','custom'], trans: ['ball','rack'], linear: ['hgr25','hgr30','hgr35'], spindle: ['3000w','4500w'], ctrl: ['linuxcnc','mach3'] } },
+    { id: 'n34-12', name: 'NEMA 34 12Nm', tier: 5, price: 215000, specs: '200 pasos · 8A · 86x150mm', compat: { driver: ['dm2280'], psu: ['80v','110v'], frame: ['custom'], trans: ['ball','rack'], linear: ['hgr30','hgr35'], spindle: ['4500w'], ctrl: ['linuxcnc'] } },
+  ],
+  driver: [
+    { id: 'a4988', name: 'A4988', tier: 1, price: 6000, specs: '2A · 1/16 micro · 8-35V', compat: { motor: ['n17-0.4','n17-0.5'], psu: ['12v','24v'], ctrl: ['grbl'] } },
+    { id: 'drv8825', name: 'DRV8825', tier: 1, price: 9500, specs: '2.5A · 1/32 micro · 8-45V', compat: { motor: ['n17-0.4','n17-0.5'], psu: ['12v','24v'], ctrl: ['grbl'] } },
+    { id: 'tb6600', name: 'TB6600', tier: 2, price: 18000, specs: '4A · 1/32 micro · 9-42V', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], psu: ['12v','24v','36v'], ctrl: ['grbl','mach3'] } },
+    { id: 'dm542', name: 'DM542', tier: 3, price: 36000, specs: '4.2A · 1/128 micro · 20-50V', compat: { motor: ['n17-0.5','n23-1.2','n23-2.0','n23-3.0'], psu: ['24v','36v','48v'], ctrl: ['grbl','mach3','linuxcnc'] } },
+    { id: 'dm860', name: 'DM860', tier: 4, price: 60000, specs: '7.2A · 1/256 micro · 20-80V', compat: { motor: ['n23-3.0','n34-4.5','n34-8.0'], psu: ['48v','60v','80v'], ctrl: ['mach3','linuxcnc'] } },
+    { id: 'dm2280', name: 'DM2280', tier: 5, price: 102000, specs: '12A · 1/256 micro · 20-110V', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], psu: ['60v','80v','110v'], ctrl: ['linuxcnc','mach3'] } },
+  ],
+  psu: [
+    { id: '12v', name: '12V 10A', tier: 1, price: 14500, specs: '120W · LED/meanwell', compat: { motor: ['n17-0.4','n17-0.5'], driver: ['a4988','drv8825','tb6600'] } },
+    { id: '24v', name: '24V 15A', tier: 2, price: 30000, specs: '360W · MeanWell', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], driver: ['a4988','drv8825','tb6600','dm542'] } },
+    { id: '36v', name: '36V 10A', tier: 3, price: 48000, specs: '360W · MeanWell', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0'], driver: ['tb6600','dm542','dm860'] } },
+    { id: '48v', name: '48V 15A', tier: 4, price: 78000, specs: '720W · MeanWell', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5'], driver: ['dm542','dm860'] } },
+    { id: '60v', name: '60V 12A', tier: 4, price: 108000, specs: '720W · MeanWell', compat: { motor: ['n23-3.0','n34-4.5','n34-8.0'], driver: ['dm860','dm2280'] } },
+    { id: '80v', name: '80V 15A', tier: 5, price: 168000, specs: '1200W · MeanWell', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], driver: ['dm860','dm2280'] } },
+    { id: '110v', name: '110V 10A', tier: 5, price: 240000, specs: '1100W · Industrial', compat: { motor: ['n34-12'], driver: ['dm2280'] } },
+  ],
+  trans: [
+    { id: 'belt', name: 'Correa GT2', tier: 1, price: 18000, specs: '2mm paso · 6/10mm ancho', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], frame: ['2020','2040','2080'], linear: ['vwheel','bush','mgn7','mgn9','mgn12'] } },
+    { id: 'lead', name: 'Husillo T8', tier: 2, price: 30000, specs: '8mm/rev · precisión media', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], frame: ['2020','2040','2080'], linear: ['bush','mgn7','mgn9','mgn12'] } },
+    { id: 'ball', name: 'Bola SFU1605', tier: 4, price: 72000, specs: '5mm/rev · cero backlash', compat: { motor: ['n17-0.5','n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0'], frame: ['2040','2080','3060','custom'], linear: ['mgn12','hgr15','hgr20','hgr25'] } },
+    { id: 'rack', name: 'Cremallera M1.5', tier: 4, price: 120000, specs: 'M1.5 · larga distancia', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0','n34-12'], frame: ['2080','3060','custom'], linear: ['hgr15','hgr20','hgr25','hgr30'] } },
+  ],
+  linear: [
+    { id: 'vwheel', name: 'V-Wheel', tier: 1, price: 24000, specs: 'Rodamiento V · riel 20x20', compat: { trans: ['belt','lead'], frame: ['2020','2040'] } },
+    { id: 'bush', name: 'Buje bronce', tier: 1, price: 12000, specs: 'Buje SAE841 · varilla templada', compat: { trans: ['belt','lead'], frame: ['2020','2040'] } },
+    { id: 'mgn7', name: 'MGN7', tier: 2, price: 36000, specs: 'Mini lineal 7mm', compat: { trans: ['belt','lead'], frame: ['2020','2040'] } },
+    { id: 'mgn9', name: 'MGN9', tier: 2, price: 42000, specs: 'Mini lineal 9mm', compat: { trans: ['belt','lead','ball'], frame: ['2020','2040','2080'] } },
+    { id: 'mgn12', name: 'MGN12', tier: 3, price: 54000, specs: 'Lineal 12mm', compat: { trans: ['belt','lead','ball'], frame: ['2040','2080','3060'] } },
+    { id: 'hgr15', name: 'HGR15', tier: 4, price: 96000, specs: 'Lineal 15mm · industrial', compat: { trans: ['ball','rack'], frame: ['2080','3060','custom'] } },
+    { id: 'hgr20', name: 'HGR20', tier: 4, price: 144000, specs: 'Lineal 20mm · industrial', compat: { trans: ['ball','rack'], frame: ['3060','custom'] } },
+    { id: 'hgr25', name: 'HGR25', tier: 5, price: 216000, specs: 'Lineal 25mm · industrial pesado', compat: { trans: ['ball','rack'], frame: ['3060','custom'] } },
+    { id: 'hgr30', name: 'HGR30', tier: 5, price: 300000, specs: 'Lineal 30mm · muy pesado', compat: { trans: ['ball','rack'], frame: ['custom'] } },
+    { id: 'hgr35', name: 'HGR35', tier: 5, price: 420000, specs: 'Lineal 35mm · ultra pesado', compat: { trans: ['ball','rack'], frame: ['custom'] } },
+  ],
+  frame: [
+    { id: '2020', name: 'Alum 2020', tier: 1, price: 36000, specs: '20x20mm · ligero', compat: { motor: ['n17-0.4','n17-0.5'], trans: ['belt','lead'], linear: ['vwheel','bush','mgn7','mgn9'] } },
+    { id: '2040', name: 'Alum 2040', tier: 2, price: 60000, specs: '20x40mm · mediano', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], trans: ['belt','lead','ball'], linear: ['vwheel','bush','mgn7','mgn9','mgn12'] } },
+    { id: '2080', name: 'Alum 2080', tier: 3, price: 96000, specs: '20x80mm · robusto', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0'], trans: ['belt','lead','ball','rack'], linear: ['mgn9','mgn12','hgr15'] } },
+    { id: '3060', name: 'Alum 3060', tier: 4, price: 168000, specs: '30x60mm · industrial', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5','n34-8.0'], trans: ['ball','rack'], linear: ['mgn12','hgr15','hgr20','hgr25'] } },
+    { id: 'custom', name: 'Acero/Soldado', tier: 5, price: 360000, specs: 'Estructural soldado', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], trans: ['ball','rack'], linear: ['hgr20','hgr25','hgr30','hgr35'] } },
+  ],
+  spindle: [
+    { id: '500w', name: '500W DC', tier: 1, price: 36000, specs: 'DC 8000 RPM · fresado ligero', compat: { motor: ['n17-0.4','n17-0.5'], ctrl: ['grbl'] } },
+    { id: '800w', name: '800W DC', tier: 2, price: 60000, specs: 'DC 9000 RPM · madera/plástico', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2'], ctrl: ['grbl','mach3'] } },
+    { id: '1500w', name: '1.5kW agua', tier: 3, price: 120000, specs: 'ER11 12000 RPM · CNC router', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], ctrl: ['grbl','mach3','linuxcnc'] } },
+    { id: '2200w', name: '2.2kW agua', tier: 4, price: 180000, specs: 'ER20 24000 RPM · aluminio', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0'], ctrl: ['grbl','mach3','linuxcnc'] } },
+    { id: '3000w', name: '3.0kW agua', tier: 4, price: 264000, specs: 'ER20 24000 RPM · metal', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5','n34-8.0'], ctrl: ['mach3','linuxcnc'] } },
+    { id: '4500w', name: '4.5kW ATC', tier: 5, price: 720000, specs: 'ISO30 ATC 18000 RPM · industrial', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], ctrl: ['linuxcnc','mach3'] } },
+  ],
+  ctrl: [
+    { id: 'grbl', name: 'GRBL (Arduino)', tier: 1, price: 12000, specs: '3-4 ejes USB 32kHz', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], driver: ['a4988','drv8825','tb6600','dm542'], spindle: ['500w','800w','1500w','2200w'] } },
+    { id: 'mach3', name: 'Mach3 (PC)', tier: 3, price: 60000, specs: '6 ejes LPT/USB 100kHz', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0'], driver: ['tb6600','dm542','dm860','dm2280'], spindle: ['800w','1500w','2200w','3000w','4500w'] } },
+    { id: 'linuxcnc', name: 'LinuxCNC', tier: 4, price: 96000, specs: '9 ejes 1MHz · industrial', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5','n34-8.0','n34-12'], driver: ['dm542','dm860','dm2280'], spindle: ['1500w','2200w','3000w','4500w'] } },
+  ]
+};
+
+function cloneData(src) { return JSON.parse(JSON.stringify(src)); }
+function deepMerge(base, overrides) {
+  const r = cloneData(base);
+  for (const cat of Object.keys(r)) {
+    for (let i = 0; i < r[cat].length; i++) {
+      const key = cat + '::' + r[cat][i].id;
+      if (overrides[key] !== undefined) r[cat][i].price = overrides[key];
+    }
+  }
+  return r;
+}
+function loadOverrides() {
+  try { return JSON.parse(localStorage.getItem('cnc_price_overrides') || '{}'); } catch(e) { return {}; }
+}
+function saveOverrides(overrides) {
+  localStorage.setItem('cnc_price_overrides', JSON.stringify(overrides));
+}
+function getData() { return deepMerge(BASE_DATA, loadOverrides()); }
+
+let selected = {};
+let currentStep = 0;
+let isAdmin = false;
+let moneda = 'ARS';
+let editingCat = null;
+let editingId = null;
+
+function getTierLabel(t) { return ['','Básico','Económico','Medio','Avanzado','Profesional'][t] || ''; }
+function getTierColor(t) { return ['','#3fb950','#d29922','#f78166','#da3633','#8957e5'][t] || '#3fb950'; }
+
+function isCompatible(data, cat, itemId) {
+  const item = data[cat].find(i => i.id === itemId);
+  if (!item) return false;
+  for (const [otherCat, otherId] of Object.entries(selected)) {
+    if (otherCat === cat || !otherId) continue;
+    const other = data[otherCat].find(i => i.id === otherId);
+    if (!other) return false;
+    const ic = item.compat && item.compat[otherCat];
+    const oc = other.compat && other.compat[cat];
+    if (ic && !ic.includes(otherId)) return false;
+    if (oc && !oc.includes(itemId)) return false;
+  }
+  return true;
+}
+
+function selectComp(cat, id) {
+  const data = getData();
+  if (!isCompatible(data, cat, id)) return;
+  selected[cat] = id;
+  renderScreen();
+  renderNav();
+  if (currentStep < CATEGORIES.length - 1 && CATEGORIES[currentStep] === cat) {
+    setTimeout(nextStep, 300);
+  }
+}
+
+function getTotal() {
+  const data = getData();
+  let t = 0;
+  for (const [cat, id] of Object.entries(selected)) {
+    const item = data[cat]?.find(i => i.id === id);
+    if (item) t += item.price;
+  }
+  return t;
+}
+
+function getAvgTier() {
+  const tiers = Object.values(selected).map(id => {
+    for (const cat of CATEGORIES) { const i = getData()[cat].find(x => x.id === id); if (i) return i.tier; }
+    return 0;
+  });
+  return tiers.length ? tiers.reduce((a,b) => a+b, 0) / tiers.length : 0;
+}
+
+function fmtP(p) {
+  if (moneda === 'USD') {
+    const rate = parseFloat(localStorage.getItem('cnc_usd_rate') || '1410');
+    return 'USD ' + Math.round(p / rate).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  return '$' + Math.round(p).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ARS';
+}
+
+function init() {
+  const screens = document.getElementById('screens');
+  screens.innerHTML = CATEGORIES.map((cat, i) => `
+    <div class="step-screen" id="screen${i}">
+      <div class="screen-card ${isAdmin ? 'admin-mode' : ''}">
+        <h2>${CAT_ICONS[cat]} ${CAT_LABELS[cat]} <span style="font-size:0.7rem;color:#8b949e;font-weight:400;">(${i+1}/${CATEGORIES.length})</span></h2>
+        <div class="hint">Seleccioná el ${CAT_LABELS[cat].toLowerCase()} compatible. Los incompatibles se ven atenuados.</div>
+        <div class="comp-row" id="row${i}"></div>
+      </div>
+    </div>
+  `).join('');
+  renderNav();
+  renderScreen();
+}
+
+function renderScreen() {
+  const data = getData();
+  CATEGORIES.forEach((cat, i) => {
+    const sel = selected[cat];
+    const row = document.getElementById('row' + i);
+    if (!row) return;
+    row.innerHTML = data[cat].map(item => {
+      const compat = isCompatible(data, cat, item.id);
+      const isSel = sel === item.id;
+      const locked = !compat && !isSel;
+      return `<div class="comp-card ${isSel?'selected':''} ${locked?'incompatible':''}" onclick="${locked?'':`selectComp('${cat}','${item.id}')`}">
+        <span class="tier tier-${item.tier}">T${item.tier}</span>
+        ${isAdmin ? `<span class="edit-price" onclick="event.stopPropagation();openPriceEdit('${cat}','${item.id}')">✎</span>` : ''}
+        <div class="name">${item.name}</div>
+        <div class="specs">${item.specs}</div>
+        <div class="price">${fmtP(item.price)}</div>
+      </div>`;
+    }).join('');
+  });
+  document.querySelectorAll('.screen-card').forEach(el => el.classList.toggle('admin-mode', isAdmin));
+}
+
+function renderNav() {
+  const nav = document.getElementById('stepNav');
+  nav.innerHTML = CATEGORIES.map((cat, i) => {
+    const sel = selected[cat];
+    const cls = sel ? 'done' : (i === currentStep ? 'active' : '');
+    return `<div class="step-dot ${cls}" onclick="goStep(${i})"><span class="num">${i+1}</span>${CAT_LABELS[cat].split(' ')[0]}${sel ? ' ✓' : ''}</div>`;
+  }).join('');
+  document.getElementById('btnPrev').disabled = currentStep === 0;
+  const isLast = currentStep >= CATEGORIES.length - 1;
+  document.getElementById('btnNext').textContent = isLast ? '📋 Ver resumen' : 'Siguiente →';
+  document.getElementById('btnNext').disabled = false;
+
+  document.querySelectorAll('.step-screen').forEach(el => el.classList.remove('active'));
+  if (currentStep < CATEGORIES.length) {
+    document.getElementById('screen' + currentStep).classList.add('active');
+    document.getElementById('summaryScreen').classList.remove('active');
+  }
+}
+
+function goStep(n) {
+  if (n < 0) n = 0;
+  if (n >= CATEGORIES.length) {
+    currentStep = CATEGORIES.length;
+    document.querySelectorAll('.step-screen').forEach(el => el.classList.remove('active'));
+    document.getElementById('summaryScreen').classList.add('active');
+    renderSummary();
+    renderNav();
+    return;
+  }
+  currentStep = n;
+  renderNav();
+  renderScreen();
+}
+
+function nextStep() {
+  if (currentStep >= CATEGORIES.length - 1) {
+    goStep(CATEGORIES.length);
+  } else {
+    goStep(currentStep + 1);
+  }
+}
+
+function prevStep() {
+  goStep(currentStep - 1);
+}
+
+function renderSummary() {
+  const data = getData();
+  const total = getTotal();
+  const avg = getAvgTier();
+  const tier = Math.max(1, Math.min(5, Math.round(avg)));
+  const items = document.getElementById('summaryItems');
+  const bom = [];
+  for (const [cat, id] of Object.entries(selected)) {
+    const item = data[cat]?.find(i => i.id === id);
+    if (item) bom.push({ cat: CAT_LABELS[cat], name: item.name, price: item.price });
+  }
+  items.innerHTML = bom.map(b => `<div class="summary-item"><span style="color:#8b949e;">${b.cat}:</span><span>${b.name} <span style="color:#58a6ff;">${fmtP(b.price)}</span></span></div>`).join('');
+  const laborPct = parseFloat(document.getElementById('laborPct').value) || 0;
+  const shipPerItem = parseFloat(document.getElementById('shipCost').value) || 0;
+  const laborCost = Math.round(total * laborPct / 100);
+  const shipCost = Math.round(bom.length * shipPerItem);
+  const grandTotal = total + laborCost + shipCost;
+  document.getElementById('totalPrice').textContent = fmtP(grandTotal);
+  document.getElementById('subtotals').textContent = `Componentes: ${fmtP(total)} · MO (${laborPct}%): ${fmtP(laborCost)} · Envíos (${bom.length}×): ${fmtP(shipCost)}`;
+  document.getElementById('nivelFill').style.width = `${(avg / 5) * 100}%`;
+  document.getElementById('nivelFill').style.background = getTierColor(tier);
+  document.getElementById('nivelLabel').textContent = `${['','🟢','🟡','🟠','🔴','🟣'][tier]} Nivel: ${getTierLabel(tier)}`;
+  const bomDiv = document.getElementById('bom');
+  bomDiv.innerHTML = bom.length ? '<div style="font-size:0.75rem;color:#8b949e;">📦 BOM:</div>' + bom.map((b, i) =>
+    `<div class="bom-item">${i+1}. ${b.cat} → ${b.name}</div>`
+  ).join('') : '';
+}
+
+function resetAll() {
+  selected = {};
+  currentStep = 0;
+  renderNav();
+  renderScreen();
+  goStep(0);
+}
+
+function toggleMoneda() {
+  moneda = moneda === 'ARS' ? 'USD' : 'ARS';
+  document.getElementById('monedaBtn').textContent = moneda === 'ARS' ? '💵 ARS' : '💵 USD';
+  renderScreen();
+  if (currentStep >= CATEGORIES.length) renderSummary();
+}
+
+function toggleAdmin() {
+  if (isAdmin) { isAdmin = false; document.getElementById('adminBtn').textContent = '🔐 Admin'; renderScreen(); return; }
+  const user = prompt('Usuario:');
+  if (user !== ADMIN_USER) return;
+  const pass = prompt('Contraseña:');
+  if (pass !== ADMIN_PASS) { alert('Contraseña incorrecta'); return; }
+  isAdmin = true;
+  document.getElementById('adminBtn').textContent = '🔓 Admin ON';
+  renderScreen();
+}
+
+function openPriceEdit(cat, id) {
+  const data = getData();
+  const item = data[cat]?.find(i => i.id === id);
+  if (!item) return;
+  editingCat = cat;
+  editingId = id;
+  document.getElementById('pmCompName').value = item.name;
+  const overrides = loadOverrides();
+  const key = cat + '::' + id;
+  const currData = overrides[key] !== undefined ? overrides : BASE_DATA[cat].find(i => i.id === id);
+  const currItem = overrides[key] !== undefined ? { price: overrides[key] } : BASE_DATA[cat].find(i => i.id === id);
+  document.getElementById('pmPrice').value = currItem.price;
+  document.getElementById('pmCurrency').value = 'ARS';
+  document.getElementById('pmMonedaLabel').textContent = 'ARS';
+  document.getElementById('priceModal').classList.add('open');
+}
+
+function closePriceModal() {
+  document.getElementById('priceModal').classList.remove('open');
+}
+
+function savePriceEdit() {
+  const price = parseFloat(document.getElementById('pmPrice').value);
+  if (isNaN(price) || price < 0) { alert('Precio inválido'); return; }
+  const currency = document.getElementById('pmCurrency').value;
+  const finalPrice = currency === 'USD' ? Math.round(price * 1410) : price;
+  const overrides = loadOverrides();
+  overrides[editingCat + '::' + editingId] = finalPrice;
+  saveOverrides(overrides);
+  closePriceModal();
+  renderScreen();
+  if (currentStep >= CATEGORIES.length) renderSummary();
+}
+
+init();
+</script>
+</body>
+</html>

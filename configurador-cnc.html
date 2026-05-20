@@ -597,7 +597,8 @@ function genPDF() {
   const w = 190;
   let y = 15;
 
-  function txt(s, x, sz, opt) { doc.setFontSize(sz || 10); doc.text(s, x, y, opt || {}); }
+  function clean(t) { return t.replace(/[^\x20-\x7EáéíóúñÁÉÍÓÚÑ]/g, '').replace(/[🔧⚡🔌⛓️📏🏗️🔄💻✨✅🟢🟡🟠🔴🟣📋📄📦💰🗑️]/g, '').replace(/ñ/g,'n').replace(/Ñ/g,'N').replace(/á/g,'a').replace(/Á/g,'A').replace(/é/g,'e').replace(/É/g,'E').replace(/í/g,'i').replace(/Í/g,'I').replace(/ó/g,'o').replace(/Ó/g,'O').replace(/ú/g,'u').replace(/Ú/g,'U'); }
+  function txt(s, x, sz, opt) { doc.setFontSize(sz || 10); doc.text(clean(s), x, y, opt || {}); }
 
   doc.setFillColor(10, 17, 23);
   doc.rect(0, 0, 210, 297, 'F');
@@ -729,7 +730,7 @@ function genPDF() {
   doc.setFont(undefined, 'italic');
   txt('Documento no válido como factura. Recibo de seña por compra de máquina CNC.', w / 2, y, { align: 'center' });
 
-  doc.save('recibo-seña-ymanac-n' + nro + '.pdf');
+  doc.save('recibo-sena-ymanac-n' + nro + '.pdf');
 }
 
 init();

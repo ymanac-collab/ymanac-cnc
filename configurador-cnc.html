@@ -597,138 +597,65 @@ function genPDF() {
   const w = 190;
   let y = 15;
 
-  function clean(t) { return t.replace(/[^\x20-\x7EáéíóúñÁÉÍÓÚÑ]/g, '').replace(/[🔧⚡🔌⛓️📏🏗️🔄💻✨✅🟢🟡🟠🔴🟣📋📄📦💰🗑️]/g, '').replace(/ñ/g,'n').replace(/Ñ/g,'N').replace(/á/g,'a').replace(/Á/g,'A').replace(/é/g,'e').replace(/É/g,'E').replace(/í/g,'i').replace(/Í/g,'I').replace(/ó/g,'o').replace(/Ó/g,'O').replace(/ú/g,'u').replace(/Ú/g,'U'); }
-  function txt(s, x, sz, opt) { doc.setFontSize(sz || 10); doc.text(clean(s), x, y, opt || {}); }
+  function clean(t) { return t.replace(/[\u{1F000}-\u{1FFFF}]/gu, '').replace(/ñ/g,'n').replace(/Ñ/g,'N').replace(/á/g,'a').replace(/Á/g,'A').replace(/é/g,'e').replace(/É/g,'E').replace(/í/g,'i').replace(/Í/g,'I').replace(/ó/g,'o').replace(/Ó/g,'O').replace(/ú/g,'u').replace(/Ú/g,'U'); }
+  function tx(s, x, sz, st, c) { doc.setFont('Helvetica', st || 'normal'); doc.setFontSize(sz || 9); doc.setTextColor(c || 139, 148, 158); doc.text(clean(s), x, y, {}); }
+  function ln(yy) { doc.setDrawColor(48, 54, 61); doc.line(10, yy, 200, yy); }
 
   doc.setFillColor(10, 17, 23);
   doc.rect(0, 0, 210, 297, 'F');
-  doc.setTextColor(201, 209, 217);
 
-  doc.setFontSize(16);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(88, 166, 255);
-  txt('YMANAC CNC', w / 2, 16, { align: 'center' });
-  doc.setFontSize(9);
-  doc.setTextColor(139, 148, 158);
-  txt('www.ymanac-cnc.com.ar  |  WhatsApp: 1128895177', w / 2, 22, { align: 'center' });
-  y = 30;
+  tx('YMANAC CNC', w/2, 14, 'bold', [88,166,255]); y += 9;
+  tx('ymanac-cnc.com.ar  |  WhatsApp: 1128895177', w/2, 8, 'normal', [100,110,120]); y += 3;
+  ln(y); y += 5;
 
-  doc.setDrawColor(48, 54, 61);
-  doc.line(10, y, 200, y);
-  y += 6;
+  tx('RECIBO DE SEÑA NRO ' + nro, w/2, 12, 'bold', [88,166,255]); y += 8;
+  tx('Fecha: ' + fecha, 10, 8, 'normal', [150,155,160]); y += 5;
+  ln(y); y += 6;
 
-  doc.setFontSize(13);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(88, 166, 255);
-  txt('RECIBO DE SEÑA N° ' + nro, w / 2, y, { align: 'center' });
-  y += 8;
-  doc.setFontSize(9);
-  doc.setTextColor(139, 148, 158);
-  txt('Fecha: ' + fecha, 10, y);
-  y += 6;
+  tx('DATOS DEL CLIENTE', 10, 10, 'bold', [190,200,210]); y += 7;
+  tx('Nombre: ' + nom, 15, 9, 'normal', [150,155,160]); y += 5;
+  tx('DNI/CUIL: ' + (dni || '-'), 15, 9); y += 5;
+  tx('Telefono: ' + (tel || '-'), 15, 9); y += 5;
+  ln(y); y += 6;
 
-  doc.setDrawColor(48, 54, 61);
-  doc.line(10, y, 200, y);
-  y += 8;
-
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(201, 209, 217);
-  txt('DATOS DEL CLIENTE', 10, y);
-  y += 7;
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
-  txt('Nombre: ' + nom, 15, y); y += 6;
-  txt('DNI/CUIL: ' + (dni || '-'), 15, y); y += 6;
-  txt('Teléfono: ' + (tel || '-'), 15, y); y += 6;
-
-  doc.setDrawColor(48, 54, 61);
-  doc.line(10, y, 200, y);
-  y += 8;
-
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(201, 209, 217);
-  txt('MÁQUINA CONFIGURADA', 10, y);
-  y += 7;
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(139, 148, 158);
+  tx('MAQUINA CONFIGURADA', 10, 10, 'bold', [190,200,210]); y += 7;
   for (const b of bom) {
-    txt(b.cat + ': ' + b.name, 15, y);
-    y += 5;
-    if (y > 270) { doc.addPage(); y = 15; }
+    tx(b.cat + ': ' + b.name, 15, 8); y += 4.5;
+    if (y > 270) { doc.addPage(); y = 15; doc.setFillColor(10,17,23); doc.rect(0,0,210,297,'F'); }
   }
+  y += 2;
+  ln(y); y += 6;
 
-  y += 3;
-  doc.setDrawColor(48, 54, 61);
-  doc.line(10, y, 200, y);
-  y += 8;
-
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(201, 209, 217);
-  txt('RESUMEN ECONÓMICO', 10, y);
-  y += 7;
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(139, 148, 158);
+  tx('RESUMEN ECONOMICO', 10, 10, 'bold', [190,200,210]); y += 7;
   const lines = [
-    ['Total componentes:', '$' + total.toLocaleString('es-AR')],
+    ['Componentes:', '$' + total.toLocaleString('es-AR')],
     ['Mano de obra (' + laborPct + '%):', '$' + laborCost.toLocaleString('es-AR')],
-    ['Envío (' + bom.length + ' items):', '$' + shipCost.toLocaleString('es-AR')],
+    ['Envio (' + bom.length + ' items):', '$' + shipCost.toLocaleString('es-AR')],
     ['', ''],
     ['TOTAL', '$' + grandTotal.toLocaleString('es-AR')],
-    ['Seña pagada', '$' + seña.toLocaleString('es-AR')],
+    ['Sena pagada', '$' + seña.toLocaleString('es-AR')],
     ['Saldo pendiente', '$' + saldo.toLocaleString('es-AR')],
   ];
   for (const l of lines) {
-    if (l[0] === 'TOTAL' || l[0] === 'Saldo pendiente') {
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(88, 166, 255);
-    } else if (l[0] === 'Seña pagada') {
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(63, 185, 80);
-    } else {
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(139, 148, 158);
-    }
-    if (l[0] === '') { y += 1; continue; }
-    txt(l[0], 15, y);
-    txt(l[1], 190, y, { align: 'right' });
-    y += 6;
+    if (l[0] === '') { y += 2; continue; }
+    const st = (l[0]==='TOTAL'||l[0]==='Saldo pendiente') ? 'bold' : (l[0]==='Sena pagada' ? 'bold' : 'normal');
+    const co = (l[0]==='TOTAL'||l[0]==='Saldo pendiente') ? [88,166,255] : (l[0]==='Sena pagada' ? [63,185,80] : [139,148,158]);
+    tx(l[0], 15, 9, st, co);
+    tx(l[1], w, 9, st, co);
+    y += 5.5;
   }
+  y += 3;
+  ln(y); y += 6;
 
-  y += 5;
-  doc.setDrawColor(48, 54, 61);
-  doc.line(10, y, 200, y);
-  y += 8;
-
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(201, 209, 217);
-  txt('FIRMAS', 10, y);
-  y += 10;
-
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(139, 148, 158);
+  tx('FIRMAS', 10, 10, 'bold', [190,200,210]); y += 10;
+  doc.setDrawColor(100,110,120); doc.line(15, y, 80, y);
+  tx('Cliente: ' + nom, 15, 8, 'normal', [139,148,158]);
+  if (sigData) doc.addImage(sigData, 'PNG', w-80, y-10, 60, 18);
+  y += 11;
   doc.line(15, y, 80, y);
-  txt('Cliente: ' + nom, 15, y - 2);
-  if (sigData) {
-    const imgW = 60;
-    const imgH = 20;
-    doc.addImage(sigData, 'PNG', w - 80, y - 12, imgW, imgH);
-  }
-  y += 10;
-  doc.line(15, y, 80, y);
-  txt('YMANAC CNC', 15, y - 2);
+  tx('YMANAC CNC', 15, 8); y += 12;
 
-  y += 15;
-  doc.setFontSize(7);
-  doc.setTextColor(48, 54, 61);
-  doc.setFont(undefined, 'italic');
-  txt('Documento no válido como factura. Recibo de seña por compra de máquina CNC.', w / 2, y, { align: 'center' });
+  tx('Documento no valido como factura. Recibo de sena por compra de maquina CNC.', w/2, 7, 'normal', [50,55,60]);
 
   doc.save('recibo-sena-ymanac-n' + nro + '.pdf');
 }

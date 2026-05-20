@@ -384,12 +384,19 @@ function toggleMoneda() {
 }
 
 function loginAdmin() {
+  if (isAdmin) {
+    isAdmin = false;
+    document.getElementById('adminBtn').textContent = '🔐 Admin';
+    document.getElementById('panelBtn').style.display = 'none';
+    renderScreen();
+    return;
+  }
   const user = prompt('Usuario:');
   if (user !== ADMIN_USER) { alert('Usuario incorrecto'); return; }
   const pass = prompt('Contraseña:');
   if (pass !== ADMIN_PASS) { alert('Contraseña incorrecta'); return; }
   isAdmin = true;
-  document.getElementById('adminBtn').textContent = '🔓 Admin';
+  document.getElementById('adminBtn').textContent = '🔓 Cerrar Admin';
   document.getElementById('panelBtn').style.display = 'inline-block';
   renderScreen();
 }

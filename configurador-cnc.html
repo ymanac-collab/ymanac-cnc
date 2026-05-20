@@ -413,6 +413,9 @@ function openAdminPanel() {
   }
   html += `<div class="btn-row">
     <button class="btn btn-secondary" onclick="closeAdminPanel()">Cancelar</button>
+    <button class="btn btn-secondary" onclick="exportPrices()">📤 Exportar JSON</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Importar JSON</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importPrices(event)">
     <button class="btn btn-primary" onclick="saveAdminPrices()">💾 Guardar todo</button>
   </div>`;
   document.getElementById('adminPanelBody').innerHTML = html;
@@ -433,6 +436,36 @@ function saveAdminPrices() {
   closeAdminPanel();
   renderScreen();
   if (currentStep >= CATEGORIES.length) renderSummary();
+}
+
+function exportPrices() {
+  const overrides = loadOverrides();
+  const blob = new Blob([JSON.stringify(overrides, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'precios-cnc.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importPrices(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      saveOverrides(data);
+      renderScreen();
+      if (currentStep >= CATEGORIES.length) renderSummary();
+      document.getElementById('importFile').value = '';
+      alert('✅ Precios importados correctamente');
+      if (document.getElementById('adminPanelModal').classList.contains('open')) openAdminPanel();
+    } catch(err) {
+      alert('❌ Error al leer el archivo JSON');
+    }
+  };
+  reader.readAsText(file);
 }
 
 init();

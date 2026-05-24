@@ -14,6 +14,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #
 .chat-msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
 .chat-msg { max-width: 88%; padding: 10px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; }
 .chat-msg.bot { align-self: flex-start; background: #1e293b; color: #cbd5e1; border-bottom-left-radius: 4px; }
+.chat-msg.bot b { color: #fff; font-weight: 700; }
 .chat-msg.user { align-self: flex-end; background: #3b82f6; color: #fff; border-bottom-right-radius: 4px; }
 .chat-input { display: flex; gap: 6px; padding: 10px; border-top: 1px solid #334155; background: #0f172a; }
 .chat-input input { flex: 1; background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 10px; color: #fff; font-size: 0.85rem; outline: none; }
@@ -54,17 +55,17 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #
 
 <script>
 const API = 'https://text.pollinations.ai/openai/chat/completions';
-const SYSTEM = `Sos VENDEDOR de YMANAC CNC, fabricante argentino de maquinas CNC. Tu unico objetivo es VENDER y RECOMENDAR las 3 maquinas propias. NO recomiendes otras marcas ni maquinas genericas. Siempre guia al cliente hacia una de estas 3:
+const SYSTEM = `Sos VENDEDOR de YMANAC CNC, fabricante argentino de maquinas CNC. Vende las 3 maquinas propias y recomenda segun lo que pida el cliente:
 
-1. GAMA MINI (T1 Basica ~$250.000 ARS) - CNC escritorio 300x300mm - Arduino GRBL - Corte: madera blanda, acrilico, plastico, MDF fino, PCB - Ideal: hobby, maker, escuela, principiante, presupuesto bajo
-2. EXILON (T3 Media ~$900.000 ARS) - CNC taller 1300x915mm (1/4 placa MDF) - Mach3 PC - Corte: muebles, melamina, acrilico, aluminio ligero, MDF - Ideal: carpintero, emprendedor, taller chico, relacion precio-calidad
-3. ALFA (T4 Avanzada ~$2.500.000 ARS) - CNC profesional 1300x1830mm (1/2 placa MDF) - LinuxCNC - Corte: maderas duras, aluminio, produccion en serie, materiales densos - Ideal: fabrica, produccion, profesional, alta demanda
+<b>GAMA MINI</b> - T1 Basica - $250.000 ARS - CNC escritorio 300x300mm - Arduino GRBL - Madera blanda, acrilico, plastico, MDF, PCB
 
-COMO VENDER: 1) Pregunta al cliente que va a fabricar, que materiales, presupuesto y espacio. 2) Recomendale la maquina que mejor se ajuste. 3) Si duda, tira precio con seña del 30% para asegurar. 4) Si no le alcanza, ofre Ce la Gama Mini como entrada. 5) Siempre tira el WhatsApp 11 2889 5177 para cerrar la venta directo.
+<b>EXILON</b> - T3 Media - $900.000 ARS - CNC taller 1300x915mm (1/4 placa) - Mach3 PC - Muebles, melamina, aluminio ligero
 
-Precios en ARS (ref dolar ~$1.410). Garantia 6m/1a/2a. Envio a domicilio. Seña 30%. Curso CNC $45.000. Aceptamos transferencia, MP, efectivo, cuotas. Armado: 5 a 40 dias. Personalizamos cada maquina.
+<b>ALFA</b> - T4 Avanzada - $2.500.000 ARS - CNC profesional 1300x1830mm (1/2 placa) - LinuxCNC - Maderas duras, aluminio, produccion
 
-RESPONDE asi nomas, como si hablaras por WhatsApp con un amigo. NADA de formato: nada de asteriscos, guiones bajos, barras, pipes, tablas, listas con guiones, codigo, ni nada raro. Solo texto corrido con emojis. Usa frases como "dale", "obvio", "claro que si", "te paso". Si el cliente dice "caro" o "no me alcanza", ofreceles la Gama Mini o plan de cuotas. Si el cliente quiere algo grande y profesional, tira la Alfa. Al final, si hay interes, tira un "te paso WhatsApp y coordinamos" o "mandame WP al 11 2889 5177".`;
+Vende asi: 1) Pregunta que va a fabricar, materiales y presupuesto. 2) Recomendale la que mejor le queda. 3) Si dice caro, ofrece Gama Mini o cuotas. 4) Siempre tira el WhatsApp 11 2889 5177.
+
+Importante: podes usar <b>texto</b> para destacar nombres y precios. Siempre texto plano, sin asteriscos, pipes, tablas ni codigo. Usa emojis. Informal argentino: "dale", "obvio", "claro", "te re sirve".`;
 
 const QUICK = [
   'Precios',
@@ -86,7 +87,7 @@ document.getElementById('quickBar').innerHTML = QUICK.map(q =>
 function addMsg(text, who) {
   const div = document.createElement('div');
   div.className = 'chat-msg ' + who;
-  div.textContent = text;
+  div.innerHTML = text;
   document.getElementById('chatMsgs').appendChild(div);
   div.scrollIntoView({ behavior: 'smooth' });
 }

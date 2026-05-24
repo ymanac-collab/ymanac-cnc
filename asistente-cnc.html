@@ -102,16 +102,20 @@ function hideTyping() {
 }
 
 async function ask(messages) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
     const r = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'openai', messages })
+      body: JSON.stringify({ model: 'openai', messages }),
+      signal: ctrl.signal
     });
+    clearTimeout(timer);
     const d = await r.json();
     return d.choices?.[0]?.message?.content || 'No pude procesar la consulta.';
   } catch {
-    return 'Hubo un error. Contactanos por WhatsApp al 11 2889 5177.';
+    return 'El servicio esta demorando. Escribinos directo por WhatsApp al 11 2889 5177 y te respondemos al toque.';
   }
 }
 

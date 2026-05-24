@@ -43,7 +43,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #
 <div class="quick" id="quickBar"></div>
 
 <div class="chat-msgs" id="chatMsgs">
-  <div class="chat-msg bot">Hola! Soy el asistente de YMANAC CNC. Preguntame sobre precios, máquinas, componentes, garantía, envíos o lo que necesites.</div>
+  <div class="chat-msg bot">Hola! Soy el asistente de YMANAC CNC. Preguntame sobre maquinas, precios, materiales o lo que necesites.</div>
 </div>
 
 <div class="chat-input">
@@ -121,19 +121,15 @@ function hideTyping() {
 
 function cleanReply(t) {
   return t
-    .split('\n')
-    .filter(l => !/^[\s\|:\-]+$/.test(l) || l.includes('<b>'))
-    .join('\n')
     .replace(/\|/g, '')
     .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
-    .replace(/___(.+?)___/g, '<b>$1</b>')
     .replace(/```[\s\S]*?```/g, '')
     .trim();
 }
 
 async function ask(messages) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 15000);
+  const timer = setTimeout(() => ctrl.abort(), 30000);
   try {
     const r = await fetch(API, {
       method: 'POST',
@@ -142,10 +138,13 @@ async function ask(messages) {
       signal: ctrl.signal
     });
     clearTimeout(timer);
+    if (!r.ok) { const t = await r.text().catch(()=>''); throw new Error(t); }
     const d = await r.json();
-    return cleanReply(d.choices?.[0]?.message?.content || 'No pude procesar la consulta.');
+    const txt = d.choices?.[0]?.message?.content;
+    if (!txt || txt.trim().length < 5) throw new Error('vacio');
+    return cleanReply(txt);
   } catch {
-    return 'El servicio esta demorando. Escribinos directo por WhatsApp al 11 2889 5177 y te respondemos al toque.';
+    return 'Disculpe, el servicio esta temporalmente demorado. Por favor deje su numero de contacto y <b>Ignacio</b> se comunicara a la brevedad.';
   }
 }
 

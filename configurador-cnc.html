@@ -77,6 +77,13 @@
   .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 25px rgba(59,130,246,0.5); }
   .btn-secondary { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
   .btn-secondary:hover:not(:disabled) { background: #30363d; border-color: #58a6ff; }
+  .summary-item { padding: 6px 0; border-bottom: 1px solid #21262d; font-size:0.8rem; }
+  .summary-item:last-child { border-bottom: none; }
+  .qty-control { display: inline-flex; align-items: center; gap: 4px; float: right; }
+  .qty-btn { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #30363d; background: #21262d; color: #c9d1d9; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .qty-btn:hover { background: #30363d; border-color: #58a6ff; }
+  .qty-inp { width: 36px; text-align: center; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 4px; padding: 2px; font-size: 0.8rem; }
+  .qty-inp:focus { outline: none; border-color: #58a6ff; }
 </style>
 </head>
 <body>
@@ -168,6 +175,7 @@ const ADMIN_PASS = 'ymanac2026';
 const CATEGORIES = ['motor','driver','psu','trans','linear','frame','spindle','ctrl'];
 const CAT_LABELS = { motor:'Motor', driver:'Driver', psu:'Fuente', trans:'Transmisión', linear:'Guías Lineales', frame:'Estructura', spindle:'Husillo/Spindle', ctrl:'Controlador' };
 const CAT_ICONS = { motor:'🔧', driver:'⚡', psu:'🔌', trans:'⛓️', linear:'📏', frame:'🏗️', spindle:'🔄', ctrl:'💻' };
+const QTYS = { motor:4, driver:4, psu:1, trans:3, linear:6, frame:1, spindle:1, ctrl:1 };
 
 const PRESETS = [
   { id:'alfa', name:'Alfa', icon:'🔵', area:'1300 × 1830 mm (½ placa)', tier:4, desc:'CNC grande profesional', comps:{ motor:'n23-2.0', driver:'dm542', psu:'48v', trans:'ball', linear:'hgr15', frame:'3060', spindle:'2200w', ctrl:'linuxcnc' } },
@@ -295,12 +303,16 @@ function selectComp(cat, id) {
   }
 }
 
+function getQty(cat) {
+  return parseInt(document.getElementById('qty_' + cat)?.value) || QTYS[cat] || 1;
+}
+
 function getTotal() {
   const data = getData();
   let t = 0;
   for (const [cat, id] of Object.entries(selected)) {
     const item = data[cat]?.find(i => i.id === id);
-    if (item) t += item.price;
+    if (item) t += item.price * getQty(cat);
   }
   return t;
 }
@@ -346,7 +358,7 @@ function renderPresets() {
     for (const [cat, id] of Object.entries(p.comps)) {
       const item = data[cat]?.find(i => i.id === id);
       if (!item) { ok = false; break; }
-      total += item.price;
+      total += item.price * QTYS[cat];
     }
     const col = ['','#3fb950','#d29922','#f78166','#da3633','#8957e5'][p.tier] || '#3fb950';
     const tierLbl = ['','Básico','Económico','Medio','Avanzado','Profesional'][p.tier] || '';
@@ -441,32 +453,60 @@ function prevStep() {
   goStep(currentStep - 1);
 }
 
+function summarizeLine(cat) {
+  const data = getData();
+  const id = selected[cat];
+  if (!id) return null;
+  const item = data[cat]?.find(i => i.id === id);
+  if (!item) return null;
+  const qty = getQty(cat);
+  const sub = item.price * qty;
+  return { cat: CAT_LABELS[cat], icon: CAT_ICONS[cat], name: item.name, price: item.price, qty, sub };
+}
+
 function renderSummary() {
   const data = getData();
   const total = getTotal();
   const avg = getAvgTier();
   const tier = Math.max(1, Math.min(5, Math.round(avg)));
   const items = document.getElementById('summaryItems');
-  const bom = [];
-  for (const [cat, id] of Object.entries(selected)) {
-    const item = data[cat]?.find(i => i.id === id);
-    if (item) bom.push({ cat: CAT_LABELS[cat], name: item.name, price: item.price });
-  }
-  items.innerHTML = bom.map(b => `<div class="summary-item"><span style="color:#8b949e;">${b.cat}:</span><span>${b.name} <span style="color:#58a6ff;">${fmtP(b.price)}</span></span></div>`).join('');
+  const lines = CATEGORIES.map(cat => summarizeLine(cat)).filter(Boolean);
+  items.innerHTML = lines.map(l => `
+    <div class="summary-item">
+      <span style="color:#8b949e;">${l.icon} ${l.cat}:</span>
+      <span>${l.name}</span>
+      <span class="qty-control">
+        <button class="qty-btn" onclick="chgQty('${l.cat}',-1)">−</button>
+        <input class="qty-inp" id="qty_${l.cat}" type="number" value="${l.qty}" min="1" max="99" onchange="renderSummary()">
+        <button class="qty-btn" onclick="chgQty('${l.cat}',1)">+</button>
+        <span style="color:#58a6ff;min-width:80px;text-align:right;display:inline-block;">${fmtP(l.sub)}</span>
+      </span>
+    </div>`).join('');
+  const bom = lines.map(l => ({ cat: l.cat, name: l.name, price: l.price, qty: l.qty }));
+  const itemCount = bom.reduce((s, l) => s + l.qty, 0);
   const laborPct = parseFloat(document.getElementById('laborPct').value) || 0;
   const shipPerItem = parseFloat(document.getElementById('shipCost').value) || 0;
   const laborCost = Math.round(total * laborPct / 100);
-  const shipCost = Math.round(bom.length * shipPerItem);
+  const shipCost = Math.round(itemCount * shipPerItem);
   const grandTotal = total + laborCost + shipCost;
   document.getElementById('totalPrice').textContent = fmtP(grandTotal);
-  document.getElementById('subtotals').textContent = `Componentes: ${fmtP(total)} · MO (${laborPct}%): ${fmtP(laborCost)} · Envíos (${bom.length}×): ${fmtP(shipCost)}`;
+  document.getElementById('subtotals').textContent = `Componentes: ${fmtP(total)} · MO (${laborPct}%): ${fmtP(laborCost)} · Envíos (${itemCount}×): ${fmtP(shipCost)}`;
   document.getElementById('nivelFill').style.width = `${(avg / 5) * 100}%`;
   document.getElementById('nivelFill').style.background = getTierColor(tier);
   document.getElementById('nivelLabel').textContent = `${['','🟢','🟡','🟠','🔴','🟣'][tier]} Nivel: ${getTierLabel(tier)}`;
   const bomDiv = document.getElementById('bom');
   bomDiv.innerHTML = bom.length ? '<div style="font-size:0.75rem;color:#8b949e;">📦 BOM:</div>' + bom.map((b, i) =>
-    `<div class="bom-item">${i+1}. ${b.cat} → ${b.name}</div>`
+    `<div class="bom-item">${i+1}. ${b.cat} → ${b.name} ×${b.qty}</div>`
   ).join('') : '';
+}
+
+function chgQty(cat, delta) {
+  const inp = document.getElementById('qty_' + cat);
+  if (!inp) return;
+  let v = parseInt(inp.value) || QTYS[cat] || 1;
+  v = Math.max(1, Math.min(99, v + delta));
+  inp.value = v;
+  renderSummary();
 }
 
 function resetAll() {
@@ -633,13 +673,16 @@ function genPDF() {
   const total = getTotal();
   const laborPct = parseFloat(document.getElementById('laborPct').value) || 0;
   const shipPerItem = parseFloat(document.getElementById('shipCost').value) || 0;
-  const bom = [];
-  for (const [cat, id] of Object.entries(selected)) {
+  const bom = CATEGORIES.map(cat => {
+    const id = selected[cat];
+    if (!id) return null;
     const item = data[cat]?.find(i => i.id === id);
-    if (item) bom.push({ cat: CAT_LABELS[cat], name: item.name, price: item.price });
-  }
+    if (!item) return null;
+    return { cat: CAT_LABELS[cat], name: item.name, price: item.price, qty: getQty(cat) };
+  }).filter(Boolean);
+  const itemCount = bom.reduce((s, b) => s + b.qty, 0);
   const laborCost = Math.round(total * laborPct / 100);
-  const shipCost = Math.round(bom.length * shipPerItem);
+  const shipCost = Math.round(itemCount * shipPerItem);
   const grandTotal = total + laborCost + shipCost;
   const saldo = grandTotal - seña;
   const fecha = new Date().toLocaleDateString('es-AR');
@@ -673,7 +716,7 @@ function genPDF() {
 
   tx('MAQUINA CONFIGURADA', 10, 10, 'bold', [190,200,210]); y += 7;
   for (const b of bom) {
-    tx(b.cat + ': ' + b.name, 15, 8); y += 4.5;
+    tx(b.cat + ': ' + b.name + ' x' + b.qty, 15, 8); y += 4.5;
     if (y > 270) { doc.addPage(); y = 15; doc.setFillColor(10,17,23); doc.rect(0,0,210,297,'F'); }
   }
   y += 2;
@@ -683,7 +726,7 @@ function genPDF() {
   const lines = [
     ['Componentes:', '$' + total.toLocaleString('es-AR')],
     ['Mano de obra (' + laborPct + '%):', '$' + laborCost.toLocaleString('es-AR')],
-    ['Envio (' + bom.length + ' items):', '$' + shipCost.toLocaleString('es-AR')],
+    ['Envio (' + itemCount + ' items):', '$' + shipCost.toLocaleString('es-AR')],
     ['', ''],
     ['TOTAL', '$' + grandTotal.toLocaleString('es-AR')],
     ['Sena pagada', '$' + seña.toLocaleString('es-AR')],

@@ -68,7 +68,7 @@ PRODUCTOS:
 <b>ALFA</b> (T4 Avanzada - $2.500.000 ARS) - CNC profesional 1300x1830mm (1/2 placa MDF). Controlador LinuxCNC. Materiales: maderas duras, aluminio, produccion en serie.
 
 VENTA:
-1. Pregunte al cliente que material trabaja, presupuesto y espacio disponible.
+1. Pregunte al cliente: ¿Con qué materiales trabaja principalmente? (Madera, acrílico, MDF, metal, etc.). 2. ¿Cuál es el presupuesto aproximado que tiene en mente?. 3. ¿Cuál es el espacio disponible en su taller? (Altura, anchura, profundidad).
 2. Recomiende la maquina segun sus necesidades.
 3. Si pregunta por el aviso, ofrezca el CNC Router Mach3. Explique que se entrega sin cabezal ni mesa base para que el pueda configurarlo segun su necesidad y compatible con routers Dewalt, Makita, Bosch y spindles industriales.
 4. Explique que fabrican modelos estandar o totalmente personalizados segun material y tamaño.
@@ -136,7 +136,7 @@ async function ask(messages) {
       const r = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'openai', messages: msgs }),
+        body: JSON.stringify({ model: 'mistral', messages: msgs }),
         signal: ctrl.signal
       });
       clearTimeout(timer);

@@ -3,1417 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YMANAC CNC - Configurador Profesional</title>
+<title>YMANAC CNC - Máquinas CNC Argentina</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; overflow-x: hidden; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#0a0e14; color:#c9d1d9; overflow-x:hidden; }
+a { color:#58a6ff; text-decoration:none; }
+.container { max-width:1200px; margin:0 auto; padding:0 20px; }
 
-  /* HEADER */
-  .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 20px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #334155; }
-  .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
-  .logo-text { color: #fff; font-weight: 700; font-size: 1.2rem; }
-  .logo-text span { color: #06b6d4; }
-  .header-btn { background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
-  .header-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+/* Header */
+.header { position:sticky; top:0; z-index:100; background:rgba(10,14,20,0.92); backdrop-filter:blur(12px); border-bottom:1px solid #1e2530; }
+.header-inner { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; max-width:1200px; margin:0 auto; }
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#06b6d4); display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:800; color:#fff; }
+.logo-text { font-size:1.1rem; font-weight:800; color:#fff; }
+.logo-text span { color:#06b6d4; }
+.header-links { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.header-btn { padding:7px 16px; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer; transition:all 0.2s; border:none; background:linear-gradient(135deg,#3b82f6,#06b6d4); color:#fff; display:inline-flex; align-items:center; gap:5px; }
+.header-btn:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(59,130,246,0.3); }
+.header-btn.ghost { background:transparent; border:1px solid #30363d; color:#8b949e; }
+.header-btn.ghost:hover { border-color:#58a6ff; color:#c9d1d9; }
+.header-btn.green { background:linear-gradient(135deg,#25d366,#128C7E); }
 
-  /* HERO */
-  .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); padding: 60px 20px 40px; text-align: center; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 50%, rgba(6,182,212,0.08) 0%, transparent 50%), radial-gradient(circle at 70% 50%, rgba(59,130,246,0.08) 0%, transparent 50%); }
-  .hero-content { max-width: 800px; margin: 0 auto; position: relative; }
-  .hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); color: #fff; font-weight: 800; line-height: 1.2; margin-bottom: 15px; }
-  .hero h1 span { background: linear-gradient(135deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero p { color: #94a3b8; font-size: 1.05rem; max-width: 600px; margin: 0 auto 25px; line-height: 1.6; }
-  .hero-steps { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
-  .hero-step { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px 20px; min-width: 140px; flex: 1; max-width: 180px; }
-  .hero-step .num { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; margin: 0 auto 8px; }
-  .hero-step .txt { color: #cbd5e1; font-size: 0.75rem; font-weight: 500; }
+/* Hero */
+.hero { position:relative; min-height:85vh; display:flex; align-items:center; overflow:hidden; }
+.hero-bg { position:absolute; inset:0; background:url('https://images.pexels.com/photos/6932360/pexels-photo-6932360.jpeg') center/cover no-repeat; filter:brightness(0.25) saturate(0.8); }
+.hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,#0a0e14 0%,transparent 50%,#0a0e14 100%); }
+.hero-content { position:relative; z-index:2; max-width:700px; padding:40px 20px; }
+.hero-badge { display:inline-block; padding:4px 14px; border-radius:20px; background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; font-size:0.7rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-bottom:20px; }
+.hero h1 { font-size:clamp(1.8rem,5vw,3rem); font-weight:800; color:#fff; line-height:1.15; margin-bottom:10px; }
+.hero h1 span { background:linear-gradient(135deg,#3b82f6,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero p { font-size:1rem; color:#8b949e; line-height:1.6; margin-bottom:25px; max-width:560px; }
+.hero-buttons { display:flex; gap:12px; flex-wrap:wrap; }
+.hero-btn { padding:14px 32px; border-radius:10px; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.3s; border:none; display:inline-flex; align-items:center; gap:8px; }
+.hero-btn.primary { background:linear-gradient(135deg,#3b82f6,#06b6d4); color:#fff; box-shadow:0 4px 20px rgba(59,130,246,0.3); }
+.hero-btn.primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(59,130,246,0.4); }
+.hero-btn.secondary { background:rgba(255,255,255,0.08); color:#c9d1d9; border:1px solid #30363d; }
+.hero-btn.secondary:hover { background:rgba(255,255,255,0.12); border-color:#58a6ff; }
+.hero-stats { display:flex; gap:30px; margin-top:30px; }
+.hero-stat { text-align:center; }
+.hero-stat .num { font-size:1.3rem; font-weight:800; color:#58a6ff; }
+.hero-stat .label { font-size:0.65rem; color:#8b949e; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
 
-  /* CONTAINER */
-  .main { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
-  .main h2 { font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+/* Sections */
+.section { padding:60px 0; }
+.section-title { text-align:center; margin-bottom:40px; }
+.section-title h2 { font-size:1.6rem; font-weight:800; color:#fff; margin-bottom:6px; }
+.section-title p { color:#8b949e; font-size:0.85rem; max-width:500px; margin:0 auto; }
 
-  /* STEP NAV */
-  .step-nav { display: flex; gap: 8px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 8px; }
-  .step-nav-item { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.3s; white-space: nowrap; font-size: 0.85rem; font-weight: 500; color: #64748b; flex-shrink: 0; }
-  .step-nav-item:hover { border-color: #94a3b8; }
-  .step-nav-item.active { border-color: #3b82f6; background: #eff6ff; color: #3b82f6; }
-  .step-nav-item.done { border-color: #10b981; background: #f0fdf4; color: #10b981; }
-  .step-nav-item .sn { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; background: #e2e8f0; color: #64748b; }
-  .step-nav-item.active .sn { background: #3b82f6; color: #fff; }
-  .step-nav-item.done .sn { background: #10b981; color: #fff; }
-  .step-nav-item .arrow { color: #cbd5e1; margin-left: 4px; }
+/* Machine Cards */
+.machines-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+.machine-card { background:linear-gradient(145deg,#111820,#0d1117); border:1px solid #1e2530; border-radius:16px; overflow:hidden; transition:all 0.3s; }
+.machine-card:hover { transform:translateY(-4px); border-color:#58a6ff; box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+.machine-img { height:180px; background:center/cover no-repeat; position:relative; }
+.machine-img .tier-badge { position:absolute; top:10px; right:10px; padding:3px 10px; border-radius:8px; font-size:0.6rem; font-weight:700; text-transform:uppercase; }
+.machine-body { padding:16px; }
+.machine-body h3 { font-size:1rem; font-weight:700; color:#fff; margin-bottom:2px; }
+.machine-body .area { font-size:0.7rem; color:#8b949e; margin-bottom:8px; }
+.machine-body .specs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.machine-body .spec { font-size:0.6rem; padding:2px 8px; border-radius:4px; background:#1e2530; color:#8b949e; }
+.machine-body .price { font-size:1.1rem; font-weight:800; color:#58a6ff; margin-bottom:10px; }
+.machine-body .desc { font-size:0.75rem; color:#8b949e; line-height:1.5; }
+.machine-btn { display:block; text-align:center; padding:8px; margin-top:12px; border-radius:8px; background:linear-gradient(135deg,#3b82f6,#06b6d4); color:#fff; font-weight:600; font-size:0.75rem; transition:all 0.2s; border:none; cursor:pointer; width:100%; }
+.machine-btn:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(59,130,246,0.3); }
 
-  /* STEP CONTENT */
-  .step-content { display: none; }
-  .step-content.active { display: block; }
+/* Armado Manual CTA */
+.cta-banner { background:linear-gradient(135deg,#111820,#0d1117); border:1px solid #1e2530; border-radius:16px; padding:40px; text-align:center; position:relative; overflow:hidden; }
+.cta-banner::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(circle at 30% 50%,rgba(59,130,246,0.06),transparent 50%); }
+.cta-banner h2 { font-size:1.4rem; font-weight:800; color:#fff; position:relative; }
+.cta-banner p { color:#8b949e; font-size:0.85rem; margin:10px auto 20px; max-width:500px; position:relative; }
+.cta-banner .btn-wrap { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; position:relative; }
+.cta-btn { padding:14px 36px; border-radius:10px; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:8px; }
+.cta-btn.big { background:linear-gradient(135deg,#3b82f6,#06b6d4); color:#fff; border:none; box-shadow:0 4px 20px rgba(59,130,246,0.3); animation:pulse-glow 2s ease-in-out infinite; }
+.cta-btn.big:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(59,130,246,0.5); }
+.cta-btn.outline { background:transparent; border:1px solid #30363d; color:#8b949e; }
+.cta-btn.outline:hover { border-color:#58a6ff; color:#c9d1d9; }
+@keyframes pulse-glow { 0%,100% { box-shadow:0 4px 20px rgba(59,130,246,0.3); } 50% { box-shadow:0 4px 30px rgba(59,130,246,0.6); } }
 
-  /* QUESTION CARDS */
-  .q-section { background: #fff; border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .q-section h3 { font-size: 1rem; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
-  .q-section .desc { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; }
+/* Features Grid */
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+.feature-card { background:linear-gradient(145deg,#111820,#0d1117); border:1px solid #1e2530; border-radius:12px; padding:24px; text-align:center; transition:all 0.3s; }
+.feature-card:hover { border-color:#30363d; transform:translateY(-2px); }
+.feature-card .icon { font-size:2rem; margin-bottom:10px; }
+.feature-card h3 { font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:4px; }
+.feature-card p { font-size:0.75rem; color:#8b949e; line-height:1.5; }
 
-  .opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .opt-card { position: relative; padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: center; }
-  .opt-card:hover { border-color: #94a3b8; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-  .opt-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-  .opt-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
-  .opt-card .name { font-weight: 600; font-size: 0.9rem; color: #0f172a; }
-  .opt-card .desc { font-size: 0.75rem; color: #64748b; margin-top: 4px; line-height: 1.3; }
-  .opt-card .badge { position: absolute; top: 8px; right: 8px; font-size: 0.6rem; background: #e2e8f0; color: #64748b; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+/* Tools Grid */
+.tools-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+.tool-card { background:linear-gradient(145deg,#111820,#0d1117); border:1px solid #1e2530; border-radius:12px; padding:20px; transition:all 0.3s; cursor:pointer; }
+.tool-card:hover { border-color:#58a6ff; transform:translateY(-2px); }
+.tool-card .icon { font-size:1.6rem; margin-bottom:8px; }
+.tool-card h3 { font-size:0.85rem; font-weight:700; color:#fff; margin-bottom:3px; }
+.tool-card p { font-size:0.7rem; color:#8b949e; line-height:1.4; }
 
-  /* LEVEL BAR */
-  .level-bar { display: flex; gap: 4px; margin-bottom: 15px; background: #f1f5f9; border-radius: 8px; padding: 8px; border: 1px solid #e2e8f0; overflow-x: auto; flex-wrap: wrap; }
-  .level-step { display: flex; align-items: center; gap: 6px; padding: 5px 10px; background: #fff; border-radius: 6px; font-size: 0.7rem; color: #94a3b8; white-space: nowrap; }
-  .level-step.active { color: #3b82f6; background: #eff6ff; border: 1px solid #3b82f6; }
-  .level-step.done { color: #10b981; }
-  .level-step .num { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; background: #e2e8f0; color: #94a3b8; flex-shrink: 0; }
-  .level-step.done .num { background: #10b981; color: #fff; }
-  .level-step.active .num { background: #3b82f6; color: #fff; }
-  .level-step .arrow { color: #cbd5e1; margin-left: 2px; }
+/* Process */
+.process-steps { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.process-step { flex:1; min-width:150px; max-width:220px; text-align:center; padding:20px; }
+.process-step .num { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#06b6d4); display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; color:#fff; margin:0 auto 10px; }
+.process-step h4 { font-size:0.8rem; font-weight:700; color:#fff; margin-bottom:4px; }
+.process-step p { font-size:0.7rem; color:#8b949e; }
 
-  /* COMPONENT SECTIONS */
-  .comp-section { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
-  .comp-section h3 { font-size: 0.9rem; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-  .comp-section h3 .tag { font-size: 0.65rem; background: #e2e8f0; color: #64748b; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
-  .comp-section h3 .tag.done { background: #d1fae5; color: #059669; }
-  .comp-section h3 .ml-link { margin-left: auto; font-size: 0.6rem; color: #3b82f6; text-decoration: none; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; }
+/* Footer */
+.footer { border-top:1px solid #1e2530; padding:30px 0; text-align:center; }
+.footer .social { display:flex; gap:12px; justify-content:center; margin-bottom:12px; }
+.footer .social a { width:36px; height:36px; border-radius:50%; background:#1e2530; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all 0.2s; }
+.footer .social a:hover { background:#30363d; }
+.footer p { font-size:0.7rem; color:#484f58; }
 
-  .comp-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .comp-card { flex: 1; min-width: 140px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
-  .comp-card:hover { border-color: #3b82f6; }
-  .comp-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 1px #3b82f6; }
-  .comp-card.incompatible { opacity: 0.3; cursor: not-allowed; filter: grayscale(0.7); }
-  .comp-card .name { font-size: 0.8rem; font-weight: 700; color: #0f172a; padding-right: 22px; }
-  .comp-card .specs { font-size: 0.65rem; color: #64748b; margin-top: 3px; line-height: 1.3; }
-  .comp-card .price { font-size: 0.7rem; color: #3b82f6; margin-top: 5px; font-weight: 600; }
-  .comp-card .tier { position: absolute; top: 5px; right: 5px; display: inline-block; font-size: 0.5rem; padding: 1px 6px; border-radius: 6px; font-weight: 700; }
-  .tier-1 { background: #3fb950; color: #0d1117; }
-  .tier-2 { background: #d29922; color: #0d1117; }
-  .tier-3 { background: #f78166; color: #0d1117; }
-  .tier-4 { background: #da3633; color: #fff; }
-  .tier-5 { background: #8957e5; color: #fff; }
-  .comp-card .check { position: absolute; top: 5px; left: 5px; font-size: 0.7rem; color: #3b82f6; }
+/* WhatsApp float */
+.whatsapp-float { position:fixed; bottom:20px; right:20px; z-index:99; width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#25d366,#128C7E); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#fff; box-shadow:0 4px 20px rgba(37,211,102,0.3); cursor:pointer; transition:all 0.2s; border:none; }
+.whatsapp-float:hover { transform:scale(1.08); box-shadow:0 6px 30px rgba(37,211,102,0.5); }
 
-  /* RANGE SLIDER */
-  .range-group { margin-top: 10px; }
-  .range-group label { font-size: 0.85rem; color: #64748b; display: block; margin-bottom: 5px; }
-  .range-group input[type="range"] { width: 100%; accent-color: #3b82f6; height: 6px; }
-  .range-val { text-align: center; font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin: 5px 0; }
-
-  /* PROGRESS */
-  .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; margin-bottom: 25px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #06b6d4); border-radius: 3px; transition: 0.5s; }
-
-  /* NAV BUTTONS */
-  .nav-buttons { display: flex; gap: 10px; justify-content: space-between; margin-top: 20px; }
-  .btn { padding: 12px 32px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.3s; border: none; }
-  .btn-primary { background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #fff; }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
-  .btn-secondary { background: #fff; color: #0f172a; border: 2px solid #e2e8f0; }
-  .btn-secondary:hover { border-color: #94a3b8; }
-  .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
-  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(16,185,129,0.4); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-  /* GUIDE ANIMATIONS */
-  @keyframes pulse-guide { 0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59,130,246,0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(59,130,246,0); } }
-  @keyframes bounce-guide { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-  @keyframes finger-point { 0%,100% { opacity: 1; transform: translateX(0); } 50% { opacity: 1; transform: translateX(6px); } }
-  .guide-pulse { animation: pulse-guide 2s ease-in-out infinite; }
-  .guide-bounce { animation: bounce-guide 1.5s ease-in-out infinite; }
-  .guide-finger { display: inline-block; animation: finger-point 1.2s ease-in-out infinite; font-size: 1.2rem; vertical-align: middle; }
-  .guide-arrow-down { display: block; text-align: center; animation: bounce-guide 1.5s ease-in-out infinite; font-size: 1.5rem; color: #3b82f6; margin-top: -10px; }
-
-  /* STEP GUIDE OVERLAY */
-  .step-guide { display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #eff6ff, #e0f2fe); border: 1px solid #93c5fd; border-radius: 12px; padding: 10px 16px; margin-bottom: 15px; font-size: 0.85rem; color: #1e40af; }
-  .step-guide .icon { font-size: 1.2rem; }
-  .step-guide strong { color: #1d4ed8; }
-
-  /* RESULT CARD */
-  .result-card { background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 20px; padding: 30px; color: #fff; margin-top: 20px; }
-  .result-card h3 { font-size: 1.1rem; margin-bottom: 15px; color: #06b6d4; }
-  .result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; }
-  .result-item .ri-label { color: #94a3b8; }
-  .result-item .ri-value { color: #e2e8f0; font-weight: 500; }
-  .result-total { font-size: 1.8rem; font-weight: 800; text-align: center; padding: 15px 0; background: linear-gradient(135deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .result-total-sub { font-size: 0.8rem; color: #64748b; text-align: center; -webkit-text-fill-color: #94a3b8; }
-  .result-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: rgba(59,130,246,0.15); color: #3b82f6; margin-top: 10px; text-align: center; }
-
-  /* EXTRAS SECTION */
-  .extras-section { margin-top: 15px; }
-  .extra-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 15px; margin-bottom: 10px; }
-  .extra-card h4 { color: #94a3b8; font-size: 0.8rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .extra-card .opt-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .extra-opt { padding: 8px 14px; border: 2px solid rgba(255,255,255,0.15); border-radius: 8px; cursor: pointer; font-size: 0.75rem; color: #cbd5e1; background: transparent; transition: 0.2s; }
-  .extra-opt:hover { border-color: rgba(59,130,246,0.5); }
-  .extra-opt.selected { border-color: #3b82f6; background: rgba(59,130,246,0.15); color: #3b82f6; }
-  .extra-opt .price-tag { display: block; font-size: 0.65rem; color: #64748b; margin-top: 2px; }
-  .extra-opt.selected .price-tag { color: #3b82f6; }
-  .extra-opt .checkmark { display: none; }
-  .extra-opt.selected .checkmark { display: inline; }
-
-  .delivery-input { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .delivery-input input, .delivery-input textarea { flex: 1; min-width: 150px; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.8rem; }
-  .delivery-input input::placeholder, .delivery-input textarea::placeholder { color: #64748b; }
-
-  /* CHAT ASSISTANT */
-  .chat-float { max-width: 500px; margin: 20px auto 0; cursor: pointer; }
-  .chat-float-wrap { background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid #334155; border-radius: 16px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); animation: chat-bounce 2.5s ease-in-out infinite; }
-  @keyframes chat-bounce { 0%,100% { transform: translateY(0); } 30% { transform: translateY(-4px); } 50% { transform: translateY(0); } 70% { transform: translateY(-2px); } }
-  .chat-float-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; animation: chat-glow 2s ease-in-out infinite; }
-  @keyframes chat-glow { 0%,100% { box-shadow: 0 0 5px rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 20px rgba(59,130,246,0.6); } }
-  .chat-float-text { flex: 1; }
-  .chat-float-text .title { font-size: 0.85rem; font-weight: 700; color: #e2e8f0; }
-  .chat-float-text .sub { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
-  .chat-float-arrow { font-size: 0.8rem; color: #3b82f6; animation: chat-arrow 1s ease-in-out infinite; }
-  @keyframes chat-arrow { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
-  .chat-dots { display: flex; gap: 4px; margin-top: 3px; }
-  .chat-dots span { width: 5px; height: 5px; border-radius: 50%; background: #06b6d4; animation: dot-blink 1.4s infinite; }
-  .chat-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .chat-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dot-blink { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
-  .chat-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 997; display: none; align-items: center; justify-content: center; }
-  .chat-overlay.open { display: flex; }
-  .chat-box { width: 520px; max-height: 680px; background: #0f172a; border: 1px solid #334155; border-radius: 16px; display: none; flex-direction: column; box-shadow: 0 8px 40px rgba(0,0,0,0.5); overflow: hidden; }
-  .chat-box.open { display: flex; }
-  .chat-box.fixed { position: fixed; bottom: 105px; left: 50%; margin-left: -260px; width: 520px; max-height: 680px; background: #0f172a; border: 1px solid #334155; border-radius: 16px; z-index: 998; display: none; flex-direction: column; box-shadow: 0 8px 40px rgba(0,0,0,0.5); overflow: hidden; }
-  .chat-box.open { display: flex; }
-  .chat-header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 14px 16px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
-  .chat-header .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-  .chat-header .name { font-weight: 600; font-size: 0.85rem; color: #fff; }
-  .chat-header .status { font-size: 0.65rem; color: #10b981; }
-  .chat-header .close { margin-left: auto; background: none; border: none; color: #64748b; cursor: pointer; font-size: 1.2rem; }
-  .chat-msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 440px; }
-  .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.78rem; line-height: 1.4; }
-  .chat-msg.bot { align-self: flex-start; background: #1e293b; color: #cbd5e1; border-bottom-left-radius: 4px; }
-  .chat-msg.user { align-self: flex-end; background: #3b82f6; color: #fff; border-bottom-right-radius: 4px; }
-  .chat-input { display: flex; border-top: 1px solid #334155; padding: 8px; }
-  .chat-input input { flex: 1; background: #1e293b; border: none; padding: 10px 12px; border-radius: 8px; color: #fff; font-size: 0.8rem; outline: none; }
-  .chat-input input::placeholder { color: #64748b; }
-  .chat-input button { background: #3b82f6; border: none; color: #fff; border-radius: 8px; padding: 10px 14px; margin-left: 6px; cursor: pointer; font-size: 0.8rem; }
-  .chat-input button:hover { background: #2563eb; }
-  .chat-faq { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px; border-top: 1px solid #1e293b; }
-  .chat-faq-btn { font-size: 0.65rem; background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 12px; padding: 4px 10px; cursor: pointer; }
-  .chat-faq-btn:hover { background: #334155; color: #cbd5e1; }
-
-  /* PAYMENT SECTION */
-  .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-  .payment-method { padding: 10px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
-  .payment-method:hover { border-color: rgba(59,130,246,0.5); }
-  .payment-method.selected { border-color: #3b82f6; background: rgba(59,130,246,0.1); }
-  .payment-method .pm-icon { font-size: 1.2rem; }
-  .payment-method .pm-name { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; }
-
-  /* CONFIRMATION */
-  .confirm-section { margin-top: 15px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 18px; }
-  .confirm-section h4 { color: #10b981; font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-  .confirm-items { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
-  .confirm-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #cbd5e1; padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; }
-  .confirm-item .ci-icon { font-size: 0.9rem; }
-  .confirm-check { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 8px; cursor: pointer; }
-  .confirm-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: #10b981; cursor: pointer; }
-  .confirm-check label { font-size: 0.8rem; color: #e2e8f0; cursor: pointer; }
-
-  /* BOTTOM CTA */
-  .cta-section { text-align: center; padding: 40px 20px; margin-top: 20px; }
-  .cta-section h2 { font-size: 1.5rem; margin-bottom: 15px; justify-content: center; }
-  .cta-section p { color: #64748b; max-width: 500px; margin: 0 auto 20px; }
-
-  /* RECOMMENDATION STYLES */
-  .rec-question { background: #fff; border-radius: 16px; padding: 25px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: none; }
-  .rec-question.active { display: block; }
-  .rec-question h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-  .rec-question .desc { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; }
-  .rec-opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .rec-opt-card { padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: center; }
-  .rec-opt-card:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-  .rec-opt-card.selected { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-  .rec-opt-card .icon { font-size: 1.5rem; margin-bottom: 6px; }
-  .rec-opt-card .name { font-weight: 600; font-size: 0.85rem; color: #0f172a; }
-  .rec-opt-card .sub { font-size: 0.7rem; color: #64748b; margin-top: 3px; }
-  .rec-dot-progress { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; }
-  .rec-dot { width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; transition: 0.3s; }
-  .rec-dot.active { background: #3b82f6; transform: scale(1.3); }
-  .rec-dot.done { background: #10b981; }
-  .rec-header { background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 16px; padding: 25px; color: #fff; text-align: center; margin-bottom: 15px; }
-  .rec-header .level { font-size: 2rem; font-weight: 800; }
-  .rec-header .level-name { font-size: 1.1rem; color: #94a3b8; margin-top: 4px; }
-  .rec-badge { display: inline-block; padding: 4px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; margin-top: 8px; }
-  .rb1 { background: #3fb950; color: #0d1117; } .rb2 { background: #d29922; color: #0d1117; } .rb3 { background: #f78166; color: #0d1117; }
-  .rb4 { background: #da3633; color: #fff; } .rb5 { background: #8957e5; color: #fff; }
-  .rec-section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
-  .rec-section h4 { font-size: 0.9rem; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .rec-section p, .rec-section li { font-size: 0.82rem; color: #475569; line-height: 1.6; }
-  .rec-section ul { margin-left: 18px; }
-  .rec-section li { margin-bottom: 3px; }
-  .rec-sell-point { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-  .rec-sell-point:last-child { border: none; }
-  .rec-sell-point .sp-icon { font-size: 1.2rem; flex-shrink: 0; }
-  .rec-sell-point .sp-text { font-size: 0.82rem; color: #334155; }
-  .rec-sell-point .sp-text strong { color: #0f172a; }
-  .rec-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .rec-compare-card { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; }
-  .rec-compare-card .c-level { font-weight: 700; font-size: 0.85rem; }
-  .rec-compare-card .c-detail { font-size: 0.7rem; color: #64748b; margin-top: 4px; line-height: 1.3; }
-  .rec-compare-card .c-veredict { font-size: 0.7rem; font-weight: 600; margin-top: 6px; }
-  .rec-compare-card.c-rec { border-color: #3b82f6; background: #eff6ff; }
-  .rec-compare-card.c-next { border-color: #e2e8f0; background: #fafafa; opacity: 0.7; }
-  .rec-compare-card.c-prev { border-color: #e2e8f0; background: #fafafa; opacity: 0.7; }
-  .rec-perfil-grid { display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.8rem;color:#475569; }
-
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .opt-grid { grid-template-columns: 1fr 1fr; }
-    .rec-opt-grid { grid-template-columns: 1fr; }
-    .rec-compare-grid { grid-template-columns: 1fr; }
-    .hero-step { max-width: none; }
-    .step-nav { gap: 5px; }
-    .step-nav-item { padding: 8px 12px; font-size: 0.75rem; }
-  }
+/* Responsive */
+@media(max-width:768px) {
+  .header-links .header-btn span { display:none; }
+  .hero-buttons { flex-direction:column; }
+  .hero-btn { justify-content:center; }
+  .hero-stats { gap:20px; }
+  .section { padding:40px 0; }
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
+<header class="header">
   <div class="header-inner">
-    <div class="logo">
-      <div class="logo-icon">⚙</div>
+    <a href="/" class="logo">
+      <div class="logo-icon">Y</div>
       <div class="logo-text">YMANAC <span>CNC</span></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="header-btn" onclick="compartirFacebook()" style="background:linear-gradient(135deg,#1877f2,#0d65d9);">📘 Compartir</button>
-      <button class="header-btn" onclick="window.open('https://wa.me/5491128895177','_blank')" style="background:linear-gradient(135deg,#25d366,#128c7e);">💬 WhatsApp</button>
-      <button class="header-btn" onclick="document.getElementById('resultSection').scrollIntoView({behavior:'smooth'})">Ver mi proyecto</button>
+    </a>
+    <div class="header-links">
+      <a href="configurador-cnc.html" class="header-btn ghost"><span>Configurador</span></a>
+      <a href="asistente-cnc.html" class="header-btn ghost"><span>Asistente IA</span></a>
+      <a href="curso-basico-cnc.html" class="header-btn ghost"><span>Curso CNC</span></a>
+      <a href="mantenimiento-cnc.html" class="header-btn ghost"><span>Mantenimiento</span></a>
+      <a href="https://wa.me/5491128895177" target="_blank" class="header-btn green">WhatsApp</a>
     </div>
   </div>
-</div>
+</header>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-content">
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content container">
+    <div class="hero-badge">Fabricación Argentina</div>
     <h1>Diseñá tu <span>CNC a medida</span></h1>
-    <p style="color:#06b6d4;font-size:0.85rem;font-weight:600;margin-top:-8px;margin-bottom:15px;text-transform:uppercase;letter-spacing:2px;">✨ Novedoso — Armá tu propia CNC ✨</p>
-    <button class="btn btn-primary guide-pulse" style="font-size:1.1rem;padding:16px 40px;margin-top:5px;" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'});setTimeout(()=>goStep(0),500)">🔥 ARMAR MI CNC <span class="guide-finger">👉</span></button>
-    <p>Respondé unas preguntas y te armamos la máquina ideal para tu taller. Desde hobby hasta producción industrial.</p>
-    <div class="hero-steps">
-      <div class="hero-step"><div class="num">1</div><div class="txt">Respondé y recibí tu recomendación</div></div>
-      <div class="hero-step"><div class="num">2</div><div class="txt">Confirmá tu necesidad</div></div>
-      <div class="hero-step"><div class="num">3</div><div class="txt">Personalizá componentes</div></div>
-      <div class="hero-step"><div class="num">4</div><div class="txt">Recibí tu presupuesto</div></div>
+    <p>Máquinas CNC router fabricadas a pedido en Argentina. Configurá cada componente, recibí tu presupuesto personalizado y empezá a crear.</p>
+    <div class="hero-buttons">
+      <a href="configurador-cnc.html" class="hero-btn primary">⚙️ Armado manual →</a>
+      <a href="#machines" class="hero-btn secondary">Ver modelos</a>
+      <a href="asistente-cnc.html" class="hero-btn secondary">🤖 Consultá al asistente</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">3</div><div class="label">Modelos</div></div>
+      <div class="hero-stat"><div class="num">8</div><div class="label">Componentes</div></div>
+      <div class="hero-stat"><div class="num">5-40</div><div class="label">Días fabricación</div></div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- CHAT ASSISTANT INLINE -->
-<div class="chat-float" onclick="toggleChat()" id="chatBtn">
-  <div class="chat-float-wrap">
-    <div class="chat-float-avatar">🤖</div>
-    <div class="chat-float-text">
-      <div class="title">🤖 Consultame!</div>
-      <div class="sub">IA · Preguntá sobre máquinas, componentes, precios</div>
-      <div class="chat-dots"><span></span><span></span><span></span></div>
+<section class="section" id="machines">
+  <div class="container">
+    <div class="section-title">
+      <h2>Nuestras máquinas</h2>
+      <p>Elegí el modelo que se adapte a tu proyecto. Todos se fabrican a pedido.</p>
     </div>
-    <span class="chat-float-arrow">👉</span>
-  </div>
-</div>
+    <div class="machines-grid">
+      <div class="machine-card">
+        <div class="machine-img" style="background-image:url('https://images.pexels.com/photos/8414003/pexels-photo-8414003.jpeg');">
+          <span class="tier-badge" style="background:#8957e5;color:#fff;">Profesional</span>
+        </div>
+        <div class="machine-body">
+          <h3>🔵 Alfa</h3>
+          <div class="area">1300 × 1830 mm (½ placa)</div>
+          <div class="specs">
+            <span class="spec">LinuxCNC</span>
+            <span class="spec">T4 Avanzada</span>
+            <span class="spec">2.2kW agua</span>
+          </div>
+          <div class="price">Desde $2.500.000 ARS</div>
+          <div class="desc">CNC profesional para producción en serie. Corta maderas duras, aluminio, melamina. Estructura 3060 industrial.</div>
+          <a href="configurador-cnc.html" class="machine-btn">Configurar →</a>
+        </div>
+      </div>
 
-<div class="chat-overlay" id="chatOverlay" onclick="closeChat(event)">
-  <div class="chat-box" id="chatBox" onclick="event.stopPropagation()">
-    <div class="chat-header">
-      <div class="avatar">🤖</div>
-      <div><div class="name">Asistente YMANAC</div><div class="status">● Online · <span style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:4px;font-size:0.55rem;">IA</span></div></div>
-      <button onclick="resetChat()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:0.65rem;padding:2px 6px;">Nuevo</button>
-      <button class="close" onclick="closeChat(event)">✕</button>
-    </div>
-    <div class="chat-msgs" id="chatMsgs">
-      <div class="chat-msg bot">🤖 ¡Hola! Soy el asistente IA de YMANAC CNC. Preguntame lo que necesites: recomendación de máquina, componentes, precios, garantía, lo que sea. ¡Estoy acá para ayudarte!</div>
-    </div>
-    <div class="chat-faq" id="chatFAQs"></div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Escribí tu consulta..." onkeydown="if(event.key==='Enter')sendChat()">
-      <button onclick="sendChat()">Enviar</button>
-    </div>
-  </div>
-</div>
+      <div class="machine-card">
+        <div class="machine-img" style="background-image:url('https://images.pexels.com/photos/37697622/pexels-photo-37697622.jpeg');">
+          <span class="tier-badge" style="background:#f78166;color:#fff;">Medio</span>
+        </div>
+        <div class="machine-body">
+          <h3>🟢 Exilon</h3>
+          <div class="area">1300 × 915 mm (¼ placa)</div>
+          <div class="specs">
+            <span class="spec">Mach3</span>
+            <span class="spec">T3 Media</span>
+            <span class="spec">1.5kW agua</span>
+          </div>
+          <div class="price">Desde $900.000 ARS</div>
+          <div class="desc">CNC de taller para emprendedores. Corta MDF, acrílico, aluminio ligero. Ideal para muebles y letreros.</div>
+          <a href="configurador-cnc.html" class="machine-btn">Configurar →</a>
+        </div>
+      </div>
 
-<!-- MAIN -->
-<div class="main">
-
-  <!-- Step Progress -->
-  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
-  <div class="step-nav" id="stepNav"></div>
-
-  <!-- STEP 0: RECOMENDACIÓN -->
-  <!-- STEP 0: RECOMENDACIÓN -->
-  <div class="step-content active" id="step0">
-    <div class="step-guide">
-      <span class="icon">🎯</span>
-      <span>Respondé 4 preguntas y te <strong>recomendamos el nivel ideal</strong>. Después ajustás los componentes.</span>
-    </div>
-    <div class="rec-dot-progress" id="recProgress"></div>
-    <div id="recQuestions"></div>
-    <div class="nav-buttons" id="recNavButtons">
-      <div></div>
-      <button class="btn btn-primary" id="recNextBtn" onclick="recNextQuestion()" disabled>Siguiente →</button>
-    </div>
-    <div id="recResult"></div>
-  </div>
-
-  <!-- STEP 1: NECESIDAD -->
-  <div class="step-content" id="step1">
-    <div class="step-guide">
-      <span class="icon">👆</span>
-      <span>Confirmá lo que necesitás y pasamos a los componentes.</span>
-    </div>
-    <div class="q-section">
-      <h3>🔷 ¿Qué materiales querés trabajar?</h3>
-      <div class="desc">Esto define la potencia del spindle y la estructura de la máquina.</div>
-      <div class="opt-grid" id="qMaterial"></div>
-    </div>
-    <div class="q-section">
-      <h3>🔷 ¿Qué tamaño de área de trabajo necesitás?</h3>
-      <div class="desc">El área que la máquina puede fresar sin reubicar la pieza.</div>
-      <div class="opt-grid" id="qSize"></div>
-    </div>
-    <div class="q-section">
-      <h3>🔷 ¿Qué presupuesto tenés pensado?</h3>
-      <div class="desc">No es definitivo, lo podemos ajustar después.</div>
-      <div class="opt-grid" id="qBudget"></div>
-    </div>
-    <div class="q-section">
-      <h3>🔷 ¿Qué uso le vas a dar?</h3>
-      <div class="desc">Seleccioná el que más se acerque a tu proyecto.</div>
-      <div class="opt-grid" id="qUse"></div>
-    </div>
-    <div class="nav-buttons">
-      <div></div>
-      <button class="btn btn-primary" onclick="goStep(2)" id="toStep2" disabled>Ver configuración sugerida →</button>
+      <div class="machine-card">
+        <div class="machine-img" style="background-image:url('https://images.pexels.com/photos/37703569/pexels-photo-37703569.jpeg');">
+          <span class="tier-badge" style="background:#3fb950;color:#0d1117;">Básico</span>
+        </div>
+        <div class="machine-body">
+          <h3>🟡 Gama Mini</h3>
+          <div class="area">300 × 300 mm</div>
+          <div class="specs">
+            <span class="spec">GRBL</span>
+            <span class="spec">T1 Básica</span>
+            <span class="spec">500W DC</span>
+          </div>
+          <div class="price">Desde $250.000 ARS</div>
+          <div class="desc">CNC de escritorio para empezar. Corta madera blanda, acrílico, plástico, PCB. Ideal para hobistas.</div>
+          <a href="configurador-cnc.html" class="machine-btn">Configurar →</a>
+        </div>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- STEP 2: COMPONENTES SUGERIDOS -->
-  <div class="step-content" id="step2">
-    <div class="step-guide">
-      <span class="icon">👇</span>
-      <span>Seguí la <strong>barra de pasos</strong> (1→8) — cada categoría muestra solo componentes compatibles. Tocá el que quieras.</span>
-    </div>
-    <div class="level-bar" id="levelBar"></div>
-    <div class="q-section">
-      <h3>⚙ Personalizá cada componente</h3>
-      <div class="desc">Cada categoría filtra automáticamente los incompatibles. Tocá uno para seleccionarlo.</div>
-      <div id="configCards"></div>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:15px;">
-      <button class="btn btn-success" onclick="autoBuild()">⚡ ARMAR AUTOMÁTICAMENTE</button>
-    </div>
-    <div class="nav-buttons">
-      <button class="btn btn-secondary" onclick="goStep(1)">← Atrás</button>
-      <button class="btn btn-primary" onclick="goStep(3)">Ver resumen →</button>
+<section class="section">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>⚙️ Armado manual paso a paso</h2>
+      <p>Seleccioná cada componente de tu CNC: motor, driver, fuente, transmisión, guías, estructura, spindle y controlador. Compatibilidad asegurada.</p>
+      <div class="btn-wrap">
+        <a href="configurador-cnc.html" class="cta-btn big">⚙️ Ir al armado manual →</a>
+        <a href="#models" class="cta-btn outline" onclick="document.querySelector('.machines-grid').scrollIntoView({behavior:'smooth'})">Ver modelos prearmados</a>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- STEP 3: RESUMEN -->
-  <div class="step-content" id="step3">
-    <div class="step-guide">
-      <span class="icon">📋</span>
-      <span>Acá tenés tu proyecto <strong>YMANAC CNC</strong> completo. Dejanos tus datos y te contactamos.</span>
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Asistente IA</h2>
+      <p>Consultá sobre precios, modelos, materiales y tiempos sin llenar formularios.</p>
     </div>
-    <div class="result-card" id="resultSection">
-      <h3>📋 Proyecto CNC personalizado</h3>
-      <div id="resultProfile"></div>
-      <div id="resultComponents"></div>
-      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:10px;padding-top:10px;">
-        <div class="result-total" id="resultTotal">$0</div>
-        <div class="result-total-sub" id="resultTotalUSD">Pesos argentinos · Todos los componentes + hardware</div>
-        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
-          <span class="result-badge" id="resultLevel"></span>
-          <span class="result-badge" id="resultUse"></span>
-        </div>
-      </div>
-      <div style="margin-top:15px;background:rgba(255,255,255,0.05);border-radius:12px;padding:15px;">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-          <label style="color:#94a3b8;font-size:0.75rem;">💵 Tipo de cambio 1 USD =</label>
-          <input type="number" id="usdRate" value="1410" min="1" style="width:80px;padding:4px 8px;border:1px solid rgba(255,255,255,0.2);border-radius:6px;background:rgba(255,255,255,0.1);color:#fff;font-size:0.8rem;">
-          <span style="color:#94a3b8;font-size:0.75rem;">ARS</span>
-          <a href="https://www.lanacion.com.ar/dolar-hoy/" target="_blank" style="margin-left:auto;font-size:0.6rem;color:#3b82f6;text-decoration:none;border:1px solid rgba(255,255,255,0.2);padding:2px 8px;border-radius:4px;">🔍 Dólar Hoy</a>
-        </div>
-        <h4 style="color:#94a3b8;font-size:0.85rem;margin-bottom:8px;">Desglose de costos</h4>
-        <div id="resultCostBreakdown"></div>
-      <!-- EXTRAS -->
-      <div class="extras-section" id="extrasSection">
-        <div class="extra-card">
-          <h4>🛡️ Garantía</h4>
-          <div class="opt-row" id="warrantyOpts">
-            <div class="extra-opt selected" onclick="selectWarranty('none')"><span class="checkmark">✓ </span>Sin garantía <span class="price-tag">$0</span></div>
-            <div class="extra-opt" onclick="selectWarranty('6m')"><span class="checkmark">✓ </span>6 meses <span class="price-tag">+15%</span></div>
-            <div class="extra-opt" onclick="selectWarranty('1y')"><span class="checkmark">✓ </span>1 año <span class="price-tag">+25%</span></div>
-            <div class="extra-opt" onclick="selectWarranty('2y')"><span class="checkmark">✓ </span>2 años <span class="price-tag">+40%</span></div>
-          </div>
-        </div>
-        <div class="extra-card">
-          <h4>🎓 Capacitación</h4>
-          <div class="opt-row">
-            <div class="extra-opt" onclick="toggleTraining()" id="trainingOpt"><span class="checkmark">✓ </span>Curso básico CNC <span class="price-tag" id="trainingPrice">+$45.000 ARS</span></div>
-          </div>
-        </div>
-        <div class="extra-card">
-          <h4>⏱️ Tiempo estimado de armado</h4>
-          <div style="color:#e2e8f0;font-size:0.85rem;" id="buildTime">—</div>
-        </div>
-        <div class="extra-card">
-          <h4>🚚 Coordinación de entrega</h4>
-          <div class="delivery-input">
-            <input type="text" id="delivAddress" placeholder="Dirección de entrega">
-            <input type="text" id="delivCity" placeholder="Ciudad" style="min-width:120px;">
-            <input type="text" id="delivPhone" placeholder="Teléfono" style="min-width:130px;">
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px;">
-            <div class="extra-opt" onclick="selectDelivery('pickup')" id="delivPickup"><span class="checkmark">✓ </span>Retiro en taller</div>
-            <div class="extra-opt selected" onclick="selectDelivery('delivery')" id="delivDelivery"><span class="checkmark">✓ </span>Envío a domicilio</div>
-          </div>
-        </div>
-        <div class="extra-card">
-          <h4>💳 Método de pago</h4>
-          <div class="payment-grid" id="paymentGrid">
-            <div class="payment-method selected" onclick="selectPayment('transferencia')"><div class="pm-icon">🏦</div><div class="pm-name">Transferencia</div></div>
-            <div class="payment-method" onclick="selectPayment('mercadopago')"><div class="pm-icon">💳</div><div class="pm-name">MercadoPago</div></div>
-            <div class="payment-method" onclick="selectPayment('efectivo')"><div class="pm-icon">💵</div><div class="pm-name">Efectivo</div></div>
-            <div class="payment-method" onclick="selectPayment('cuotas')"><div class="pm-icon">📆</div><div class="pm-name">Cuotas sin interés</div></div>
-          </div>
-        </div>
-      <!-- CONFIRMACIÓN FINAL -->
-      <div class="confirm-section" id="confirmSection">
-        <h4>✅ Confirmación final del proyecto</h4>
-        <div class="confirm-items" id="confirmItems"></div>
-        <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px;margin-bottom:10px;font-size:0.75rem;color:#fbbf24;line-height:1.5;">
-          <strong>⚠️ Recomendaciones para no perder la garantía:</strong><br>
-          • No modificar ni reemplazar componentes sin autorización de YMANAC CNC.<br>
-          • No exceder los parámetros de trabajo recomendados (velocidad, profundidad de corte, material).<br>
-          • Usar siempre el software y firmware original provisto con la máquina.<br>
-          • Realizar el mantenimiento preventivo indicado en el manual (lubricación, limpieza, ajuste).<br>
-          • No operar la máquina sin la capacitación adecuada o sin haber leído el manual.<br>
-          • Ante cualquier falla, contactar a YMANAC CNC antes de intentar reparar por cuenta propia.<br>
-          • La garantía cubre defectos de fabricación. No cubre daños por uso indebido, sobrecarga, accidentes o desgaste normal.
-        </div>
-        <div class="confirm-check" onclick="toggleConfirm()">
-          <input type="checkbox" id="confirmCheck" onchange="toggleConfirm()">
-          <label for="confirmCheck"><strong>Leí y acepto las condiciones de garantía.</strong> Confirmo que revisé todos los componentes, acepto los tiempos de armado, condiciones de mano de obra y envío, y deseo continuar con el pago.</label>
-        </div>
-      </div>
-    </div>
-    <div class="cta-section" id="ctaSection">
-      <h2>💳 Finalizar y pagar</h2>
-      <p>Confirmá tu proyecto para habilitar el pago.</p>
-      <div id="paymentForm" style="display:none;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:500px;margin:0 auto;">
-          <input type="text" id="contactName" placeholder="Tu nombre" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
-          <input type="email" id="contactEmail" placeholder="Tu email" style="flex:1;min-width:200px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.9rem;">
-        </div>
-        <div id="mailStatus" style="font-size:0.8rem;color:#10b981;margin-bottom:8px;display:none;">✅ Presupuesto enviado. Te va a llegar a tu mail y a YMANAC.</div>
-        <button class="btn btn-success" style="margin-top:15px;" onclick="enviarMail()" id="sendBtn">📨 Enviar presupuesto</button>
-      </div>
-    </div>
-    <div class="nav-buttons">
-      <button class="btn btn-secondary" onclick="goStep(2)">← Atrás</button>
-      <button class="btn btn-secondary" onclick="goStep(1)">🔄 Empezar de nuevo</button>
+    <div class="tools-grid" style="grid-template-columns:1fr;">
+      <a href="asistente-cnc.html" class="tool-card" style="text-align:center;padding:30px;">
+        <div class="icon" style="font-size:2.5rem;">🤖</div>
+        <h3>Asistente virtual YMANAC</h3>
+        <p>Respondé preguntas sobre máquinas, presupuestos, garantía y más. Obtené respuestas al instante.</p>
+      </a>
     </div>
   </div>
-</div>
+</section>
 
-<script>
-const questions = {
-  material: [
-    { id: 'madera', icon: '🪵', name: 'Madera', desc: 'MDF, terciado, maciza', budget: 1 },
-    { id: 'acrilico', icon: '💎', name: 'Acrílico / PVC', desc: 'Plásticos, policarbonato', budget: 2 },
-    { id: 'aluminio', icon: '🪶', name: 'Aluminio', desc: 'Chapas hasta 5mm, perfiles', budget: 3 },
-    { id: 'metales', icon: '⚙️', name: 'Metales duros', desc: 'Acero, hierro, inoxidable', budget: 5 },
-    { id: 'mixto', icon: '🔄', name: 'Uso mixto', desc: 'Varios materiales', budget: 3 },
-  ],
-  size: [
-    { id: 'pequeno', icon: '📐', name: 'Pequeño', desc: '30×30 cm o menos', budget: 1 },
-    { id: '35x35', icon: '📐', name: '35×35 cm', desc: 'CNC de escritorio compacta', budget: 1 },
-    { id: 'mediano', icon: '📏', name: 'Mediano', desc: '60×60 a 100×100 cm', budget: 2 },
-    { id: 'cuarto-placa', icon: '📋', name: '¼ de placa', desc: '~130×90 cm · 1/4 de MDF 260×183', budget: 3 },
-    { id: 'grande', icon: '📐', name: 'Grande', desc: '120×120 a 150×150 cm', budget: 3 },
-    { id: 'media-placa', icon: '⏳', name: '½ placa (próximo)', desc: '~130×180 cm · Próximamente', budget: 4 },
-    { id: 'xl', icon: '📏', name: 'Extra grande', desc: '200×100 cm o más', budget: 4 },
-  ],
-  budget: [
-    { id: 'economico', icon: '💰', name: 'Económico', desc: 'Hasta $300.000 ARS', budget: 1 },
-    { id: 'medio', icon: '💵', name: 'Medio', desc: '$300.000 - $700.000 ARS', budget: 2 },
-    { id: 'alto', icon: '💎', name: 'Premium', desc: '$700.000 - $1.500.000 ARS', budget: 3 },
-    { id: 'pro', icon: '👑', name: 'Profesional', desc: 'Más de $1.500.000 ARS', budget: 4 },
-  ],
-  use: [
-    { id: 'hobby', icon: '🎯', name: 'Hobby', desc: 'Uso esporádico, proyectos personales', budget: 1 },
-    { id: 'taller', icon: '🔧', name: 'Taller', desc: 'Uso regular, emprendimiento', budget: 2 },
-    { id: 'produccion', icon: '🏭', name: 'Producción', desc: 'Uso continuo, negocio', budget: 3 },
-    { id: 'industrial', icon: '⚡', name: 'Industrial', desc: 'Producción intensiva 24/7', budget: 4 },
-  ]
-};
-
-const comps = {
-  motor: [
-    { id: 'n17-0.4', name: 'NEMA 17 0.4Nm', tier: 1, price: 15000, specs: '200 pasos · 1.2A · 42mm', compat: { driver: ['a4988','drv8825','tb6600'], psu: ['12v','24v'], frame: ['2020','2040'], trans: ['belt','lead'], linear: ['vwheel','bush','mgn7','mgn9'], spindle: ['500w','800w','1500w'], ctrl: ['grbl'] } },
-    { id: 'n17-0.5', name: 'NEMA 17 0.5Nm', tier: 2, price: 22000, specs: '200 pasos · 2A · 42x48mm', compat: { driver: ['a4988','drv8825','tb6600','dm542'], psu: ['12v','24v'], frame: ['2020','2040'], trans: ['belt','lead','ball'], linear: ['vwheel','bush','mgn7','mgn9','mgn12'], spindle: ['500w','800w','1500w'], ctrl: ['grbl'] } },
-    { id: 'n23-1.2', name: 'NEMA 23 1.2Nm', tier: 2, price: 32000, specs: '200 pasos · 3A · 57mm', compat: { driver: ['tb6600','dm542'], psu: ['24v','36v'], frame: ['2040','2080'], trans: ['belt','lead','ball','rack'], linear: ['mgn9','mgn12','hgr15'], spindle: ['800w','1500w','2200w'], ctrl: ['grbl','mach3'] } },
-    { id: 'n23-2.0', name: 'NEMA 23 2.0Nm', tier: 3, price: 42000, specs: '200 pasos · 4A · 57x76mm', compat: { driver: ['tb6600','dm542'], psu: ['24v','36v','48v'], frame: ['2040','2080','3060'], trans: ['belt','lead','ball','rack'], linear: ['mgn12','hgr15','hgr20'], spindle: ['1500w','2200w','3000w'], ctrl: ['grbl','mach3','linuxcnc'] } },
-    { id: 'n23-3.0', name: 'NEMA 23 3.0Nm', tier: 4, price: 58000, specs: '200 pasos · 4.2A · 57x112mm', compat: { driver: ['dm542','dm860'], psu: ['36v','48v','60v'], frame: ['2080','3060'], trans: ['ball','rack'], linear: ['hgr15','hgr20','hgr25'], spindle: ['2200w','3000w'], ctrl: ['mach3','linuxcnc'] } },
-    { id: 'n34-4.5', name: 'NEMA 34 4.5Nm', tier: 4, price: 90000, specs: '200 pasos · 5.6A · 86mm', compat: { driver: ['dm860','dm2280'], psu: ['48v','60v','80v'], frame: ['3060'], trans: ['ball','rack'], linear: ['hgr20','hgr25','hgr30'], spindle: ['2200w','3000w','4500w'], ctrl: ['linuxcnc','mach3'] } },
-    { id: 'n34-8.0', name: 'NEMA 34 8.0Nm', tier: 5, price: 145000, specs: '200 pasos · 6A · 86x118mm', compat: { driver: ['dm860','dm2280'], psu: ['60v','80v'], frame: ['3060','custom'], trans: ['ball','rack'], linear: ['hgr25','hgr30','hgr35'], spindle: ['3000w','4500w'], ctrl: ['linuxcnc','mach3'] } },
-    { id: 'n34-12', name: 'NEMA 34 12Nm', tier: 5, price: 215000, specs: '200 pasos · 8A · 86x150mm', compat: { driver: ['dm2280'], psu: ['80v','110v'], frame: ['custom'], trans: ['ball','rack'], linear: ['hgr30','hgr35'], spindle: ['4500w'], ctrl: ['linuxcnc'] } },
-  ],
-  driver: [
-    { id: 'a4988', name: 'A4988', tier: 1, price: 6000, specs: '2A · 1/16 micro · 8-35V', compat: { motor: ['n17-0.4','n17-0.5'], psu: ['12v','24v'], ctrl: ['grbl'] } },
-    { id: 'drv8825', name: 'DRV8825', tier: 1, price: 9500, specs: '2.5A · 1/32 micro · 8-45V', compat: { motor: ['n17-0.4','n17-0.5'], psu: ['12v','24v'], ctrl: ['grbl'] } },
-    { id: 'tb6600', name: 'TB6600', tier: 2, price: 18000, specs: '4A · 1/32 micro · 9-42V', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], psu: ['12v','24v','36v'], ctrl: ['grbl','mach3'] } },
-    { id: 'dm542', name: 'DM542', tier: 3, price: 36000, specs: '4.2A · 1/128 micro · 20-50V', compat: { motor: ['n17-0.5','n23-1.2','n23-2.0','n23-3.0'], psu: ['24v','36v','48v'], ctrl: ['grbl','mach3','linuxcnc'] } },
-    { id: 'dm860', name: 'DM860', tier: 4, price: 60000, specs: '7.2A · 1/256 micro · 20-80V', compat: { motor: ['n23-3.0','n34-4.5','n34-8.0'], psu: ['48v','60v','80v'], ctrl: ['mach3','linuxcnc'] } },
-    { id: 'dm2280', name: 'DM2280', tier: 5, price: 102000, specs: '12A · 1/256 micro · 20-110V', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], psu: ['60v','80v','110v'], ctrl: ['linuxcnc','mach3'] } },
-  ],
-  psu: [
-    { id: '12v', name: '12V 10A', tier: 1, price: 14500, specs: '120W · LED/meanwell', compat: { motor: ['n17-0.4','n17-0.5'], driver: ['a4988','drv8825','tb6600'] } },
-    { id: '24v', name: '24V 15A', tier: 2, price: 30000, specs: '360W · MeanWell', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], driver: ['a4988','drv8825','tb6600','dm542'] } },
-    { id: '36v', name: '36V 10A', tier: 3, price: 48000, specs: '360W · MeanWell', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0'], driver: ['tb6600','dm542','dm860'] } },
-    { id: '48v', name: '48V 15A', tier: 4, price: 78000, specs: '720W · MeanWell', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5'], driver: ['dm542','dm860'] } },
-    { id: '60v', name: '60V 12A', tier: 4, price: 108000, specs: '720W · MeanWell', compat: { motor: ['n23-3.0','n34-4.5','n34-8.0'], driver: ['dm860','dm2280'] } },
-    { id: '80v', name: '80V 15A', tier: 5, price: 168000, specs: '1200W · MeanWell', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], driver: ['dm860','dm2280'] } },
-    { id: '110v', name: '110V 10A', tier: 5, price: 240000, specs: '1100W · Industrial', compat: { motor: ['n34-12'], driver: ['dm2280'] } },
-  ],
-  trans: [
-    { id: 'belt', name: 'Correa GT2', tier: 1, price: 18000, specs: '2mm paso · 6/10mm ancho · rápida', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], frame: ['2020','2040','2080'], linear: ['vwheel','bush','mgn7','mgn9','mgn12'] } },
-    { id: 'lead', name: 'Husillo T8', tier: 2, price: 30000, specs: '8mm/rev · precisión media · económica', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], frame: ['2020','2040','2080'], linear: ['bush','mgn7','mgn9','mgn12'] } },
-    { id: 'ball', name: 'Bola SFU1605', tier: 4, price: 72000, specs: '5mm/rev · cero backlash · precisa', compat: { motor: ['n17-0.5','n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0'], frame: ['2040','2080','3060','custom'], linear: ['mgn12','hgr15','hgr20','hgr25'] } },
-    { id: 'rack', name: 'Cremallera M1.5', tier: 4, price: 120000, specs: 'M1.5 · larga distancia · robusta', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0','n34-12'], frame: ['2080','3060','custom'], linear: ['hgr15','hgr20','hgr25','hgr30'] } },
-  ],
-  linear: [
-    { id: 'vwheel', name: 'V-Wheel', tier: 1, price: 24000, specs: 'Rodamiento V · riel 20x20 · económica', compat: { trans: ['belt','lead'], frame: ['2020','2040'] } },
-    { id: 'bush', name: 'Buje bronce', tier: 1, price: 12000, specs: 'Buje SAE841 · varilla templada · simple', compat: { trans: ['belt','lead'], frame: ['2020','2040'] } },
-    { id: 'mgn7', name: 'MGN7', tier: 2, price: 36000, specs: 'Mini lineal 7mm · 3D/CNC pequeño', compat: { trans: ['belt','lead'], frame: ['2020','2040'] } },
-    { id: 'mgn9', name: 'MGN9', tier: 2, price: 42000, specs: 'Mini lineal 9mm · CNC mediano', compat: { trans: ['belt','lead','ball'], frame: ['2020','2040','2080'] } },
-    { id: 'mgn12', name: 'MGN12', tier: 3, price: 54000, specs: 'Lineal 12mm · CNC router', compat: { trans: ['belt','lead','ball'], frame: ['2040','2080','3060'] } },
-    { id: 'hgr15', name: 'HGR15', tier: 4, price: 96000, specs: 'Lineal 15mm · industrial liviano', compat: { trans: ['ball','rack'], frame: ['2080','3060','custom'] } },
-    { id: 'hgr20', name: 'HGR20', tier: 4, price: 144000, specs: 'Lineal 20mm · industrial', compat: { trans: ['ball','rack'], frame: ['3060','custom'] } },
-    { id: 'hgr25', name: 'HGR25', tier: 5, price: 216000, specs: 'Lineal 25mm · industrial pesado', compat: { trans: ['ball','rack'], frame: ['3060','custom'] } },
-    { id: 'hgr30', name: 'HGR30', tier: 5, price: 300000, specs: 'Lineal 30mm · muy pesado', compat: { trans: ['ball','rack'], frame: ['custom'] } },
-    { id: 'hgr35', name: 'HGR35', tier: 5, price: 420000, specs: 'Lineal 35mm · ultra pesado', compat: { trans: ['ball','rack'], frame: ['custom'] } },
-  ],
-  frame: [
-    { id: '2020', name: 'Alum 2020', tier: 1, price: 36000, specs: '20x20mm · ligero · CNC pequeño', compat: { motor: ['n17-0.4','n17-0.5'], trans: ['belt','lead'], linear: ['vwheel','bush','mgn7','mgn9'] } },
-    { id: '2040', name: 'Alum 2040', tier: 2, price: 60000, specs: '20x40mm · mediano · CNC router', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], trans: ['belt','lead','ball'], linear: ['vwheel','bush','mgn7','mgn9','mgn12'] } },
-    { id: '2080', name: 'Alum 2080', tier: 3, price: 96000, specs: '20x80mm · robusto · CNC router+', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0'], trans: ['belt','lead','ball','rack'], linear: ['mgn9','mgn12','hgr15'] } },
-    { id: '3060', name: 'Alum 3060', tier: 4, price: 168000, specs: '30x60mm · muy robusto · industrial', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5','n34-8.0'], trans: ['ball','rack'], linear: ['mgn12','hgr15','hgr20','hgr25'] } },
-    { id: 'custom', name: 'Acero/Soldado', tier: 5, price: 360000, specs: 'Estructural soldado · máxima rigidez', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], trans: ['ball','rack'], linear: ['hgr20','hgr25','hgr30','hgr35'] } },
-  ],
-  spindle: [
-    { id: '500w', name: '500W DC', tier: 1, price: 36000, specs: 'DC motor · 8000 RPM · fresado ligero', compat: { motor: ['n17-0.4','n17-0.5'], ctrl: ['grbl'] } },
-    { id: '800w', name: '800W DC', tier: 2, price: 60000, specs: 'DC motor · 9000 RPM · madera/plástico', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2'], ctrl: ['grbl','mach3'] } },
-    { id: '1500w', name: '1.5kW agua', tier: 3, price: 120000, specs: 'ER11 · 12000 RPM · agua CNC router', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], ctrl: ['grbl','mach3','linuxcnc'] } },
-    { id: '2200w', name: '2.2kW agua', tier: 4, price: 180000, specs: 'ER20 · 24000 RPM · agua · aluminio', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0'], ctrl: ['grbl','mach3','linuxcnc'] } },
-    { id: '3000w', name: '3.0kW agua', tier: 4, price: 264000, specs: 'ER20 · 24000 RPM · agua · metal', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5','n34-8.0'], ctrl: ['mach3','linuxcnc'] } },
-    { id: '4500w', name: '4.5kW ATC', tier: 5, price: 720000, specs: 'ISO30 · ATC · 18000 RPM · industrial', compat: { motor: ['n34-4.5','n34-8.0','n34-12'], ctrl: ['linuxcnc','mach3'] } },
-  ],
-  ctrl: [
-    { id: 'grbl', name: 'GRBL (Arduino)', tier: 1, price: 12000, specs: '3-4 ejes · USB · 32kHz · hobby', compat: { motor: ['n17-0.4','n17-0.5','n23-1.2','n23-2.0'], driver: ['a4988','drv8825','tb6600','dm542'], spindle: ['500w','800w','1500w','2200w'] } },
-    { id: 'mach3', name: 'Mach3 (PC)', tier: 3, price: 60000, specs: '6 ejes · LPT/USB · 100kHz · taller', compat: { motor: ['n23-1.2','n23-2.0','n23-3.0','n34-4.5','n34-8.0'], driver: ['tb6600','dm542','dm860','dm2280'], spindle: ['800w','1500w','2200w','3000w','4500w'] } },
-    { id: 'linuxcnc', name: 'LinuxCNC', tier: 4, price: 96000, specs: '9 ejes · 1MHz · industrial · PC', compat: { motor: ['n23-2.0','n23-3.0','n34-4.5','n34-8.0','n34-12'], driver: ['dm542','dm860','dm2280'], spindle: ['1500w','2200w','3000w','4500w'] } },
-  ]
-};
-
-const categories = ['motor','driver','psu','trans','linear','frame','spindle','ctrl'];
-const catLabels = { motor:'Motor', driver:'Driver', psu:'Fuente', trans:'Transmisión', linear:'Guías Lineales', frame:'Estructura', spindle:'Husillo/Spindle', ctrl:'Controlador' };
-const catIcons = { motor:'🔧', driver:'⚡', psu:'🔌', trans:'⛓️', linear:'📏', frame:'🏗️', spindle:'🔄', ctrl:'💻' };
-const catURLs = {
-  motor: 'https://listado.mercadolibre.com.ar/motor-paso-a-paso-nema-17-nema-23-cnc',
-  driver: 'https://listado.mercadolibre.com.ar/driver-paso-a-paso-tb6600-dm542-cnc',
-  psu: 'https://listado.mercadolibre.com.ar/fuente-switching-12v-24v-48v-meanwell-cnc',
-  trans: 'https://listado.mercadolibre.com.ar/husillo-bolas-sfu1605-correa-gt2-cremallera-cnc',
-  linear: 'https://listado.mercadolibre.com.ar/guia-lineal-hgr15-mgn12-cnc',
-  frame: 'https://listado.mercadolibre.com.ar/perfil-aluminio-2040-2080-vslot-cnc',
-  spindle: 'https://listado.mercadolibre.com.ar/spindle-cnc-22kw-15kw-3000w',
-  ctrl: 'https://listado.mercadolibre.com.ar/arduino-cnc-shield-grbl-controlador'
-};
-
-let answers = { material: null, size: null, budget: null, use: null };
-let selected = {};
-let currentStep = 0;
-
-const stepDefs = [
-  { num: 0, label: 'Recomendación' },
-  { num: 1, label: 'Necesidad' },
-  { num: 2, label: 'Componentes' },
-  { num: 3, label: 'Resumen' },
-];
-
-const fmt = (p) => '$' + Math.round(p).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' ARS';
-const fmtUSD = (p) => 'USD ' + Math.round(p).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-const getTierLabel = (t) => ['','Básico','Económico','Medio','Avanzado','Profesional'][t] || '';
-const getTierColor = (t) => ['','#3fb950','#d29922','#f78166','#da3633','#8957e5'][t] || '#3fb950';
-
-// Render questions in step 1
-Object.entries(questions).forEach(([key, opts]) => {
-  const el = document.getElementById('q' + key.charAt(0).toUpperCase() + key.slice(1));
-  el.innerHTML = opts.map(o => `
-    <div class="opt-card ${answers[key] === o.id ? 'selected' : ''}" onclick="selectAnswer('${key}','${o.id}')">
-      <div class="icon">${o.icon}</div>
-      <div class="name">${o.name}</div>
-      <div class="desc">${o.desc}</div>
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-title">
+      <h2>Más herramientas</h2>
+      <p>Todo lo que necesitás para sacarle el máximo provecho a tu CNC.</p>
     </div>
-  `).join('');
-});
-
-function selectAnswer(key, id) {
-  answers[key] = id;
-  Object.entries(questions).forEach(([k, opts]) => {
-    const el = document.getElementById('q' + k.charAt(0).toUpperCase() + k.slice(1));
-    el.innerHTML = opts.map(o => `
-      <div class="opt-card ${answers[k] === o.id ? 'selected' : ''}" onclick="selectAnswer('${k}','${o.id}')">
-        <div class="icon">${o.icon}</div>
-        <div class="name">${o.name}</div>
-        <div class="desc">${o.desc}</div>
-      </div>
-    `).join('');
-  });
-  document.getElementById('toStep2').disabled = !(answers.material && answers.size && answers.budget && answers.use);
-  if (key === 'material' && answers.material) {
-    const matItem = questions.material.find(m => m.id === id);
-    if (!answers.size) answers.size = 'mediano';
-    if (!answers.budget) answers.budget = ['economico','economico','medio','alto','pro'][matItem.budget - 1] || 'medio';
-    if (!answers.use) answers.use = ['hobby','taller','taller','produccion'][Math.min(matItem.budget - 1, 3)] || 'taller';
-    Object.entries(questions).forEach(([k, opts]) => {
-      const el = document.getElementById('q' + k.charAt(0).toUpperCase() + k.slice(1));
-      el.innerHTML = opts.map(o => `
-        <div class="opt-card ${answers[k] === o.id ? 'selected' : ''}" onclick="selectAnswer('${k}','${o.id}')">
-          <div class="icon">${o.icon}</div>
-          <div class="name">${o.name}</div>
-          <div class="desc">${o.desc}</div>
-        </div>
-      `).join('');
-    });
-    document.getElementById('toStep2').disabled = false;
-    setTimeout(() => goStep(2), 400);
-  }
-}
-
-// Compatibility engine
-function isCompatible(cat, itemId) {
-  const item = comps[cat].find(i => i.id === itemId);
-  if (!item) return false;
-  for (const [otherCat, otherId] of Object.entries(selected)) {
-    if (otherCat === cat || !otherId) continue;
-    const other = comps[otherCat].find(i => i.id === otherId);
-    if (!other) return false;
-    const itemCompat = item.compat && item.compat[otherCat];
-    const otherCompat = other.compat && other.compat[cat];
-    if (itemCompat && !itemCompat.includes(otherId)) return false;
-    if (otherCompat && !otherCompat.includes(itemId)) return false;
-  }
-  return true;
-}
-
-function selectComponent(cat, id) {
-  if (!isCompatible(cat, id)) return;
-  selected[cat] = id;
-  renderConfig();
-}
-
-// Auto-suggest components based on needs
-function getSuggestions() {
-  const mat = answers.material;
-  const size = answers.size;
-  const bud = answers.budget;
-  const use = answers.use;
-  let needWeight = 1;
-  const matWeight = questions.material.find(m => m.id === mat)?.budget || 1;
-  const sizeWeight = questions.size.find(s => s.id === size)?.budget || 1;
-  const budWeight = questions.budget.find(b => b.id === bud)?.budget || 1;
-  const useWeight = questions.use.find(u => u.id === use)?.budget || 1;
-  needWeight = Math.round((matWeight + sizeWeight + budWeight + useWeight) / 4);
-
-  const suggest = {};
-  categories.forEach(cat => {
-    const items = comps[cat].filter(i => i.tier <= needWeight + 1 && i.tier >= Math.max(1, needWeight - 1));
-    suggest[cat] = items.sort((a,b) => Math.abs(a.tier - needWeight) - Math.abs(b.tier - needWeight))[0]?.id || comps[cat][Math.min(needWeight - 1, comps[cat].length - 1)]?.id;
-  });
-  return suggest;
-}
-
-function getFirstEmpty() {
-  for (let i = 0; i < categories.length; i++) {
-    if (!selected[categories[i]]) return i;
-  }
-  return -1;
-}
-
-function renderConfig() {
-  const sugg = getSuggestions();
-  categories.forEach(c => { if (!selected[c]) selected[c] = sugg[c]; });
-  categories.forEach(c => { if (selected[c] && !isCompatible(c, selected[c])) selected[c] = sugg[c]; });
-
-  // Level bar
-  const bar = document.getElementById('levelBar');
-  bar.innerHTML = categories.map((cat, i) => {
-    const sel = selected[cat];
-    const cls = sel ? 'done' : (i === getFirstEmpty()) ? 'active' : '';
-    const nombre = catLabels[cat].split(' ')[0];
-    return `<div class="level-step ${cls} ${cls === 'active' ? 'guide-bounce' : ''}"><span class="num">${i+1}</span>${nombre}${sel ? ' ✓' : ''}${i < categories.length-1 ? '<span class="arrow">›</span>' : ''}</div>`;
-  }).join('');
-
-  // Component cards
-  const el = document.getElementById('configCards');
-  el.innerHTML = categories.map(cat => {
-    const sel = selected[cat];
-    return `<div class="comp-section">
-      <h3>${catIcons[cat]} ${catLabels[cat]} <span class="tag ${sel?'done':''}">${sel ? '✓ seleccionado' : 'seleccioná uno'}</span>
-        <a href="${catURLs[cat]}" target="_blank" class="ml-link">🔍 ML</a>
-      </h3>
-      <div class="comp-row">${comps[cat].map(i => {
-        const compat = isCompatible(cat, i.id);
-        const isSel = sel === i.id;
-        const locked = !compat && !isSel;
-        return `<div class="comp-card ${isSel?'selected':''} ${locked?'incompatible':''}" onclick="${locked?'':'selectComponent(\''+cat+'\',\''+i.id+'\')'}">
-          ${isSel ? '<span class="check">✓</span>' : ''}
-          <span class="tier tier-${i.tier}">T${i.tier}</span>
-          <div class="name">${i.name}</div>
-          <div class="specs">${i.specs}</div>
-          <div class="price">${fmt(i.price)}</div>
-        </div>`;
-      }).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-function getTotal() {
-  let t = 0;
-  categories.forEach(cat => {
-    const item = comps[cat]?.find(i => i.id === selected[cat]);
-    if (item) t += item.price;
-  });
-  return t;
-}
-
-function getLevel() {
-  const tiers = categories.map(c => { const i = comps[c]?.find(x => x.id === selected[c]); return i ? i.tier : 0; });
-  const avg = tiers.filter(t => t).reduce((a,b) => a+b, 0) / Math.max(1, tiers.filter(t => t).length);
-  if (avg <= 1.5) return { label: 'Básico / Hobby', emoji: '🟢' };
-  if (avg <= 2.5) return { label: 'Económico / Taller', emoji: '🟡' };
-  if (avg <= 3.5) return { label: 'Medio / Profesional', emoji: '🟠' };
-  if (avg <= 4.5) return { label: 'Avanzado / Industrial', emoji: '🔴' };
-  return { label: 'Profesional / Pesado', emoji: '🟣' };
-}
-
-function getUseLabel() {
-  const map = { hobby:'🎯 Hobby', taller:'🔧 Taller', produccion:'🏭 Producción', industrial:'⚡ Industrial' };
-  return map[answers.use] || '';
-}
-
-function renderResult() {
-  const total = getTotal();
-  const level = getLevel();
-  const rate = parseFloat(document.getElementById('usdRate').value) || 1410;
-  const hwARS = 40000;
-  const wMultiplier = warrantyMultiplier[warranty] || 1;
-  const trainingCost = training ? 45000 : 0;
-  const subtotal = (total + hwARS + trainingCost) * wMultiplier;
-  const mo = Math.round(subtotal * 0.3);
-  const envios = categories.filter(c => selected[c]).length * 8000;
-  const grandTotal = Math.round(subtotal + mo + envios);
-
-  document.getElementById('resultProfile').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;font-size:0.85rem;">
-      <div><span style="color:#94a3b8;">Material:</span> ${questions.material.find(m => m.id === answers.material)?.name || '-'}</div>
-      <div><span style="color:#94a3b8;">Área:</span> ${questions.size.find(s => s.id === answers.size)?.name || '-'}</div>
-      <div><span style="color:#94a3b8;">Presupuesto:</span> ${questions.budget.find(b => b.id === answers.budget)?.name || '-'}</div>
-      <div><span style="color:#94a3b8;">Uso:</span> ${questions.use.find(u => u.id === answers.use)?.name || '-'}</div>
+    <div class="tools-grid">
+      <a href="curso-basico-cnc.html" class="tool-card">
+        <div class="icon">📚</div>
+        <h3>Curso básico CNC</h3>
+        <p>Aprendé a operar tu máquina desde cero, nivel T1 a T5.</p>
+      </a>
+      <a href="mantenimiento-cnc.html" class="tool-card">
+        <div class="icon">🔧</div>
+        <h3>Mantenimiento</h3>
+        <p>Guía de mantenimiento según el nivel de tu máquina.</p>
+      </a>
+      <a href="asistente-cnc.html" class="tool-card">
+        <div class="icon">💬</div>
+        <h3>Chat en vivo</h3>
+        <p>Consultá con nuestro asistente IA o pedí que te contactemos.</p>
+      </a>
+      <a href="https://wa.me/5491128895177" target="_blank" class="tool-card">
+        <div class="icon">📱</div>
+        <h3>WhatsApp directo</h3>
+        <p>HabLá directo con YMANAC para presupuestos rápidos.</p>
+      </a>
     </div>
-  `;
-  document.getElementById('resultComponents').innerHTML = categories.map(cat => {
-    const item = comps[cat]?.find(i => i.id === selected[cat]);
-    return `<div class="result-item"><span class="ri-label">${catLabels[cat]||cat}</span><span class="ri-value">${item?.name || '-'} <span style="color:#06b6d4;">${item ? fmt(item.price) : ''}</span></span></div>`;
-  }).join('');
-  document.getElementById('resultComponents').innerHTML += `<div class="result-item"><span class="ri-label">🔩 Tornillos/Tuercas/Anclaje</span><span class="ri-value"><span style="color:#06b6d4;">${fmt(hwARS)}</span></span></div>`;
-  document.getElementById('resultComponents').innerHTML += training ? `<div class="result-item"><span class="ri-label">🎓 Curso básico CNC</span><span class="ri-value"><span style="color:#06b6d4;">${fmt(trainingCost)}</span></span></div>` : '';
-  document.getElementById('resultComponents').innerHTML += warranty !== 'none' ? `<div class="result-item"><span class="ri-label">🛡️ Garantía ${({none:'', '6m':'6 meses', '1y':'1 año', '2y':'2 años'})[warranty]}</span><span class="ri-value"><span style="color:#06b6d4;">×${wMultiplier}</span></span></div>` : '';
-  document.getElementById('resultTotal').textContent = fmt(subtotal);
-  document.getElementById('resultLevel').textContent = `${level.emoji} ${level.label}`;
-  document.getElementById('resultUse').textContent = getUseLabel();
+  </div>
+</section>
 
-  const tiers2 = categories.map(c => { const i = comps[c]?.find(x => x.id === selected[c]); return i ? i.tier : 0; });
-  const avgTier = tiers2.filter(t => t).reduce((a,b) => a+b, 0) / Math.max(1, tiers2.filter(t => t).length);
-
-  // Build time
-  document.getElementById('buildTime').textContent = `⏱️ ${getBuildTime()} · Nivel ${level.label}`;
-
-  // Reset confirmation on any change
-  document.getElementById('confirmCheck').checked = false;
-  document.getElementById('paymentForm').style.display = 'none';
-
-  // Confirmation items
-  const buildTime = getBuildTime();
-  const availMO = avgTier <= 2.5 ? 'Disponible en 72 hs' : avgTier <= 4 ? 'Disponible en 1 semana' : 'Disponible en 2 semanas';
-  const availShip = deliveryMode === 'pickup' ? 'Retiro en taller' : 'Envío a domicilio (consulte su zona)';
-  document.getElementById('confirmItems').innerHTML = `
-    <div class="confirm-item"><span class="ci-icon">📋</span> ${categories.filter(c => selected[c]).length}/8 componentes seleccionados</div>
-    <div class="confirm-item"><span class="ci-icon">💰</span> Total estimado: ${fmt(grandTotal)}</div>
-    <div class="confirm-item"><span class="ci-icon">🔧</span> Mano de obra: ${availMO}</div>
-    <div class="confirm-item"><span class="ci-icon">🚚</span> Entrega: ${availShip}</div>
-    <div class="confirm-item"><span class="ci-icon">⏱️</span> Tiempo de armado: ${buildTime}</div>
-    <div class="confirm-item"><span class="ci-icon">🛡️</span> Garantía: ${warranty === 'none' ? 'Sin garantía' : ({'6m':'6 meses','1y':'1 año','2y':'2 años'})[warranty]}</div>
-  `;
-
-  const breakdown = document.getElementById('resultCostBreakdown');
-  breakdown.innerHTML = `
-    <div class="result-item"><span class="ri-label">Componentes</span><span class="ri-value">${fmt(total)} <span style="color:#64748b;font-size:0.7rem;">(${Math.round(total/rate)} USD)</span></span></div>
-    <div class="result-item"><span class="ri-label">🔩 Hardware</span><span class="ri-value">${fmt(hwARS)}</span></div>
-    ${training ? `<div class="result-item"><span class="ri-label">🎓 Curso CNC</span><span class="ri-value">${fmt(trainingCost)}</span></div>` : ''}
-    ${warranty !== 'none' ? `<div class="result-item"><span class="ri-label">🛡️ Garantía (${wMultiplier}x)</span><span class="ri-value">${fmt(Math.round((total + hwARS + trainingCost) * (wMultiplier - 1)))}</span></div>` : ''}
-    <div class="result-item"><span class="ri-label">Mano de obra (30%)</span><span class="ri-value">${fmt(mo)}</span></div>
-    <div class="result-item"><span class="ri-label">Envíos (${categories.filter(c => selected[c]).length} items)</span><span class="ri-value">${fmt(envios)}</span></div>
-    <div class="result-item" style="border-bottom:none;font-weight:700;color:#06b6d4;"><span class="ri-label">Total final</span><span class="ri-value">${fmt(grandTotal)} <span style="color:#64748b;font-weight:400;font-size:0.7rem;">(${Math.round(grandTotal/rate)} USD)</span></span></div>
-  `;
-}
-
-function autoBuild() {
-  const sugg = getSuggestions();
-  categories.forEach(c => { selected[c] = sugg[c]; });
-  renderConfig();
-  setTimeout(() => goStep(3), 500);
-}
-
-// ===== RECOMMENDATION ENGINE =====
-const recQuestions = [
-  {
-    q: '🎯 ¿Qué materiales va a trabajar el cliente?',
-    desc: 'El material define la potencia y rigidez necesaria.',
-    key: 'mat',
-    opts: [
-      { id: 'madera', icon: '🪵', name: 'Madera / MDF', sub: 'Blanda, terciado, fibrofácil' },
-      { id: 'acrilico', icon: '💎', name: 'Acrílico / PVC', sub: 'Plásticos, policarbonato' },
-      { id: 'aluminio', icon: '🪶', name: 'Aluminio', sub: 'Chapas hasta 5mm' },
-      { id: 'mixto', icon: '🔄', name: 'Uso mixto', sub: 'Varios materiales' },
-      { id: 'metales', icon: '⚙️', name: 'Metales duros', sub: 'Acero, inoxidable' },
-    ]
-  },
-    {
-      q: '💰 ¿Qué presupuesto maneja?',
-      desc: 'Ayuda a definir el rango de componentes.',
-      key: 'budget',
-      opts: [
-        { id: 'economico', icon: '💰', name: 'Económico', sub: 'Hasta $300.000 ARS' },
-        { id: 'medio', icon: '💵', name: 'Medio', sub: '$300.000 - $700.000 ARS' },
-        { id: 'alto', icon: '💎', name: 'Premium', sub: '$700.000 - $1.500.000 ARS' },
-        { id: 'pro', icon: '👑', name: 'Profesional', sub: 'Más de $1.500.000 ARS' },
-      ]
-    },
-  {
-    q: '🔧 ¿Qué uso le va a dar?',
-    desc: 'La frecuencia de uso determina la robustez necesaria.',
-    key: 'uso',
-    opts: [
-      { id: 'hobby', icon: '🎯', name: 'Hobby', sub: 'Esporádico, proyectos personales' },
-      { id: 'taller', icon: '🔧', name: 'Taller', sub: 'Regular, emprendimiento' },
-      { id: 'produccion', icon: '🏭', name: 'Producción', sub: 'Continuo, negocio' },
-      { id: 'industrial', icon: '⚡', name: 'Industrial', sub: 'Producción intensiva 24/7' },
-    ]
-  },
-  {
-    q: '📏 ¿Qué tamaño de área de trabajo necesita?',
-    desc: 'El área máxima a mecanizar sin reubicar la pieza.',
-    key: 'size',
-    opts: [
-      { id: 'pequeno', icon: '📐', name: 'Pequeño', sub: '30×30 a 50×50 cm' },
-      { id: 'mediano', icon: '📏', name: 'Mediano', sub: '60×60 a 100×100 cm' },
-      { id: 'grande', icon: '📐', name: 'Grande', sub: '120×120 a 150×150 cm' },
-      { id: 'xl', icon: '📏', name: 'Extra grande', sub: '200×100 cm o más' },
-    ]
-  }
-];
-
-const recTiers = [
-  {
-    level: 1, label: 'Básico / Hobby', emoji: '🟢', clase: 'rb1',
-    titulo: 'Ideal para empezar: T1 Básico',
-    argumentos: [
-      { icon: '✅', text: '<strong>Menor inversión inicial:</strong> La opción más económica. Ideal para probar y aprender.' },
-      { icon: '🪶', text: '<strong>Perfecta para madera y acrílico:</strong> Spindle 500-800W para hobby y manualidades.' },
-      { icon: '📦', text: '<strong>Armado rápido:</strong> 5-7 días hábiles. Componentes estándar.' },
-    ],
-    contra: 'No corta metales ni aluminio. Velocidad de producción limitada.',
-    mejor_que: 'Mejor que una impresora 3D para piezas funcionales — el CNC corta en madera y acrílico con mucha más rapidez.'
-  },
-  {
-    level: 2, label: 'Económico / Taller', emoji: '🟡', clase: 'rb2',
-    titulo: 'La mejor relación precio-rendimiento: T2 Económico',
-    argumentos: [
-      { icon: '✅', text: '<strong>Más torque y velocidad:</strong> NEMA 23 + TB6600 mayor capacidad de corte.' },
-      { icon: '🛠️', text: '<strong>Guías MGN9:</strong> Mayor precisión y durabilidad que V-Wheel.' },
-      { icon: '🏪', text: '<strong>Para emprendedores:</strong> Ideal para producir piezas en madera y acrílico con calidad comercial.' },
-    ],
-    contra: 'No recomendado para aluminio intensivo. Área limitada (máx 100×100 cm).',
-    mejor_que: 'Comparada con competidores importados del mismo precio, YMANAC T2 ofrece el doble de rigidez y motores más grandes.'
-  },
-  {
-    level: 3, label: 'Medio / Profesional', emoji: '🟠', clase: 'rb3',
-    titulo: 'El caballito de batalla: T3 Profesional',
-    argumentos: [
-      { icon: '✅', text: '<strong>Aluminio y maderas duras:</strong> NEMA 23 2.0Nm + DM542 + MGN12.' },
-      { icon: '🔄', text: '<strong>Spindle 1.5-2.2kW refrigerado por agua:</strong> Trabajo continuo sin sobrecalentar.' },
-      { icon: '🏗️', text: '<strong>Estructura 2080/3060:</strong> Máxima rigidez, precisión ±0.1mm.' },
-    ],
-    contra: 'Inversión media-alta (se amortiza rápido con producción). Requiere espacio dedicado.',
-    mejor_que: 'En el mercado argentino no hay nada comparable en este rango de precio. Máquinas similares cuestan el doble importadas.'
-  },
-  {
-    level: 4, label: 'Avanzado / Industrial', emoji: '🔴', clase: 'rb4',
-    titulo: 'Potencia industrial: T4 Avanzado',
-    argumentos: [
-      { icon: '✅', text: '<strong>NEMA 34 4.5Nm:</strong> Torque pesado para metales y producción intensiva.' },
-      { icon: '⚡', text: '<strong>DM860:</strong> Microstepping de alta resolución para acabado superior.' },
-      { icon: '🔩', text: '<strong>Guías HGR15-20:</strong> Carga pesada, larga vida útil, precisión ±0.05mm.' },
-    ],
-    contra: 'Requiere instalación eléctrica dedicada (220V recomendada). Inversión importante.',
-    mejor_que: 'Equivalentes importados cuestan 3x más y no tienen soporte local. YMANAC T4 se repara y mantiene en Argentina.'
-  },
-  {
-    level: 5, label: 'Profesional / Pesado', emoji: '🟣', clase: 'rb5',
-    titulo: 'La máxima expresión en CNC: T5 Pesado',
-    argumentos: [
-      { icon: '✅', text: '<strong>NEMA 34 8-12Nm:</strong> Torque bruto para los trabajos más exigentes.' },
-      { icon: '🔄', text: '<strong>Spindle ATC 4.5kW:</strong> Cambio automático de herramienta.' },
-      { icon: '🏢', text: '<strong>Producción 24/7:</strong> Overhaul cada 500hs.' },
-    ],
-    contra: 'Inversión mayor. Requiere instalación industrial trifásica + compresor. Armado: 25-40 días.',
-    mejor_que: 'Estándar que usan las industrias metalmecánicas en Argentina. No hay importada que compita en precio con soporte local.'
-  }
-];
-
-let recCurrent = 0;
-let recAnswers = {};
-
-function renderRec() {
-  recCurrent = 0;
-  recAnswers = {};
-  document.getElementById('recResult').innerHTML = '';
-  document.getElementById('recResult').style.display = 'none';
-  document.getElementById('recNavButtons').style.display = 'flex';
-  renderRecQuestion();
-}
-
-function renderRecQuestion() {
-  const q = recQuestions[recCurrent];
-  const container = document.getElementById('recQuestions');
-  container.innerHTML = recQuestions.map((q, idx) => `
-    <div class="rec-question ${idx === recCurrent ? 'active' : ''}">
-      <h3>${q.q}</h3>
-      <div class="desc">${q.desc}</div>
-      <div class="rec-opt-grid">${q.opts.map(o => `
-        <div class="rec-opt-card ${recAnswers[q.key] === o.id ? 'selected' : ''}" onclick="recSelect('${q.key}','${o.id}')">
-          <div class="icon">${o.icon}</div>
-          <div class="name">${o.name}</div>
-          <div class="sub">${o.sub}</div>
-        </div>
-      `).join('')}</div>
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-title">
+      <h2>¿Cómo funciona?</h2>
+      <p>Cuatro pasos simples para tener tu CNC lista.</p>
     </div>
-  `).join('');
-
-  document.getElementById('recProgress').innerHTML = recQuestions.map((_, i) =>
-    `<div class="rec-dot ${i < recCurrent ? 'done' : i === recCurrent ? 'active' : ''}"></div>`
-  ).join('');
-
-  document.getElementById('recNextBtn').disabled = !recAnswers[recQuestions[recCurrent]?.key];
-}
-
-function recSelect(key, id) {
-  recAnswers[key] = id;
-  renderRecQuestion();
-}
-
-function recNextQuestion() {
-  if (recCurrent < recQuestions.length - 1) {
-    recCurrent++;
-    renderRecQuestion();
-    if (recCurrent === recQuestions.length - 1) {
-      document.getElementById('recNextBtn').textContent = 'Ver recomendación →';
-    }
-  } else {
-    showRecResult();
-  }
-}
-
-function calcRecLevel() {
-  const matW = { madera: 1, acrilico: 2, aluminio: 3, mixto: 3, metales: 5 }[recAnswers.mat] || 2;
-  const budW = { economico: 1, medio: 2, alto: 4, pro: 5 }[recAnswers.budget] || 2;
-  const usoW = { hobby: 1, taller: 2, produccion: 4, industrial: 5 }[recAnswers.uso] || 2;
-  const sizeW = { pequeno: 1, mediano: 2, grande: 3, xl: 4 }[recAnswers.size] || 2;
-  return Math.max(1, Math.min(5, Math.round((matW + budW + usoW + sizeW) / 4)));
-}
-
-function showRecResult() {
-  const level = calcRecLevel();
-  const tier = recTiers[level - 1];
-  const prevTier = level > 1 ? recTiers[level - 2] : null;
-  const nextTier = level < 5 ? recTiers[level] : null;
-
-  const matLabels = { madera:'Madera/MDF', acrilico:'Acrílico/PVC', aluminio:'Aluminio', mixto:'Uso mixto', metales:'Metales duros' };
-  const budLabels = { economico:'Económico', medio:'Medio', alto:'Premium', pro:'Profesional' };
-  const usoLabels = { hobby:'Hobby', taller:'Taller', produccion:'Producción', industrial:'Industrial' };
-  const sizeLabels = { pequeno:'Pequeño', mediano:'Mediano', grande:'Grande', xl:'Extra grande' };
-
-  document.getElementById('recQuestions').style.display = 'none';
-  document.getElementById('recProgress').style.display = 'none';
-  document.getElementById('recNavButtons').style.display = 'none';
-
-  const el = document.getElementById('recResult');
-  el.style.display = 'block';
-  el.innerHTML = `
-    <div style="margin-bottom:15px;">
-      <div class="rec-header">
-        <div class="level">${tier.emoji} ${tier.label}</div>
-        <div class="level-name">${tier.titulo}</div>
-        <span class="rec-badge ${tier.clase}">T${tier.level}</span>
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="num">1</div>
+        <h4>Elegí tu modelo</h4>
+        <p>Seleccioná entre Alfa, Exilon o Gama Mini, o armala manualmente.</p>
       </div>
-      <div class="rec-section">
-        <h4>📋 Perfil del cliente</h4>
-        <div class="rec-perfil-grid">
-          <div>🪵 Material: ${matLabels[recAnswers.mat]}</div>
-          <div>💰 Presupuesto: ${budLabels[recAnswers.budget]}</div>
-          <div>🔧 Uso: ${usoLabels[recAnswers.uso]}</div>
-          <div>📏 Área: ${sizeLabels[recAnswers.size]}</div>
-        </div>
+      <div class="process-step">
+        <div class="num">2</div>
+        <h4>Configurá componentes</h4>
+        <p>Cada parte se elige según compatibilidad y presupuesto.</p>
       </div>
-      <div class="rec-section">
-        <h4>🎯 ¿Por qué recomendamos esta máquina?</h4>
-        ${tier.argumentos.map(a => `
-          <div class="rec-sell-point">
-            <div class="sp-icon">${a.icon}</div>
-            <div class="sp-text">${a.text}</div>
-          </div>
-        `).join('')}
+      <div class="process-step">
+        <div class="num">3</div>
+        <h4>Recibí tu presupuesto</h4>
+        <p>Resumen con total, mano de obra, envío y plazo de fabricación.</p>
       </div>
-      <div class="rec-section">
-        <h4>⚡ Comparativa</h4>
-        <div class="rec-compare-grid">
-          ${prevTier ? `
-            <div class="rec-compare-card c-prev">
-              <div class="c-level">${prevTier.emoji} T${prevTier.level} ${prevTier.label.split('/')[0].trim()}</div>
-              <div class="c-detail">Se queda corto para este perfil. Mejor subir a T${level}.</div>
-              <div class="c-veredict" style="color:#64748b;">⬆ Subir a T${level}</div>
-            </div>
-          ` : '<div></div>'}
-          <div class="rec-compare-card c-rec">
-            <div class="c-level" style="color:#3b82f6;">✅ ${tier.emoji} T${tier.level} ${tier.label} ← Recomendado</div>
-            <div class="c-detail">La mejor opción para este perfil de cliente.</div>
-            <div class="c-veredict" style="color:#3b82f6;">🎯 JUSTO LO QUE NECESITA</div>
-          </div>
-          ${nextTier ? `
-            <div class="rec-compare-card c-next">
-              <div class="c-level">${nextTier.emoji} T${nextTier.level} ${nextTier.label.split('/')[0].trim()}</div>
-              <div class="c-detail">${level === 1 ? 'Más máquina de la que necesita por ahora.' : 'Más robusto, el cliente no lo requiere aún.'}</div>
-              <div class="c-veredict" style="color:#64748b;">⬇ Bajamos a T${level}</div>
-            </div>
-          ` : '<div></div>'}
-        </div>
-      </div>
-      <div class="rec-section">
-        <h4>❌ Limitaciones</h4>
-        <p>${tier.contra}</p>
-      </div>
-      <div class="rec-section">
-        <h4>💬 Argumento de venta</h4>
-        <p style="background:#f1f5f9;padding:12px;border-radius:8px;font-style:italic;">"${tier.mejor_que}"</p>
+      <div class="process-step">
+        <div class="num">4</div>
+        <h4>Señá y fabricamos</h4>
+        <p>Abonás la seña, generamos tu CNC y la recibís lista.</p>
       </div>
     </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="recUseAndGo()" style="font-size:1rem;padding:16px 36px;">✅ ¡Usar esta recomendación! →</button>
-      <button class="btn btn-secondary" onclick="recBack()">🔄 Volver a responder</button>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="social">
+      <a href="https://wa.me/5491128895177" target="_blank" style="font-size:1.2rem;">📱</a>
     </div>
-  `;
-  el.scrollIntoView({ behavior: 'smooth' });
-}
+    <p>YMANAC CNC — Máquinas CNC fabricadas en Argentina</p>
+    <p style="margin-top:4px;">WhatsApp: 11 2889-5177</p>
+    <p style="margin-top:8px;">© 2026 YMANAC CNC</p>
+  </div>
+</footer>
 
-function recBack() {
-  recCurrent = 0;
-  document.getElementById('recQuestions').style.display = 'block';
-  document.getElementById('recProgress').style.display = 'flex';
-  document.getElementById('recNavButtons').style.display = 'flex';
-  document.getElementById('recResult').style.display = 'none';
-  document.getElementById('recResult').innerHTML = '';
-  document.getElementById('recNextBtn').textContent = 'Siguiente →';
-  renderRecQuestion();
-}
-
-function recUseAndGo() {
-  // Transfer recommendation answers to step 1
-  answers.material = recAnswers.mat;
-  answers.budget = recAnswers.budget;
-  answers.use = recAnswers.uso;
-  answers.size = recAnswers.size;
-  // Re-render step 1 question cards with pre-selection
-  Object.entries(questions).forEach(([key, opts]) => {
-    const el = document.getElementById('q' + key.charAt(0).toUpperCase() + key.slice(1));
-    el.innerHTML = opts.map(o => `
-      <div class="opt-card ${answers[key] === o.id ? 'selected' : ''}" onclick="selectAnswer('${key}','${o.id}')">
-        <div class="icon">${o.icon}</div>
-        <div class="name">${o.name}</div>
-        <div class="desc">${o.desc}</div>
-      </div>
-    `).join('');
-  });
-  document.getElementById('toStep2').disabled = false;
-  goStep(1);
-}
-
-function goStep(n) {
-  if (n === 0) renderRec();
-  if (n === 2) renderConfig();
-  if (n === 3) renderResult();
-  currentStep = n;
-  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-  document.getElementById('step' + n).classList.add('active');
-  document.getElementById('progressFill').style.width = ((n / 3) * 100) + '%';
-  renderStepNav();
-}
-
-function renderStepNav() {
-  document.getElementById('stepNav').innerHTML = stepDefs.map(s => {
-    const status = s.num < currentStep ? 'done' : s.num === currentStep ? 'active' : '';
-    return `<div class="step-nav-item ${status}" onclick="goStep(${s.num})"><span class="sn">${s.num}</span>${s.label}</div>`;
-  }).join('');
-}
-
-renderRec();
-renderStepNav();
-document.getElementById('usdRate').addEventListener('input', () => { if (currentStep === 3) renderResult(); });
-
-// Warranty
-let warranty = 'none';
-let training = false;
-let deliveryMode = 'delivery';
-let paymentMethod = 'transferencia';
-const warrantyMultiplier = { none: 1, '6m': 1.15, '1y': 1.25, '2y': 1.4 };
-
-function selectWarranty(val) {
-  warranty = val;
-  document.querySelectorAll('#warrantyOpts .extra-opt').forEach(el => el.classList.remove('selected'));
-  document.querySelectorAll('#warrantyOpts .extra-opt')[{ none:0, '6m':1, '1y':2, '2y':3 }[val]].classList.add('selected');
-  renderResult();
-}
-
-function toggleTraining() {
-  training = !training;
-  document.getElementById('trainingOpt').classList.toggle('selected', training);
-  renderResult();
-}
-
-function selectDelivery(mode) {
-  deliveryMode = mode;
-  document.getElementById('delivPickup').classList.toggle('selected', mode === 'pickup');
-  document.getElementById('delivDelivery').classList.toggle('selected', mode === 'delivery');
-}
-
-function selectPayment(method) {
-  paymentMethod = method;
-  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
-  document.querySelectorAll('.payment-method')[['transferencia','mercadopago','efectivo','cuotas'].indexOf(method)].classList.add('selected');
-}
-
-function toggleConfirm() {
-  const checked = document.getElementById('confirmCheck').checked;
-  document.getElementById('paymentForm').style.display = checked ? 'block' : 'none';
-  document.querySelector('#ctaSection h2').textContent = checked ? '💳 Finalizar y pagar' : '💳 Confirmá tu proyecto para pagar';
-  document.querySelector('#ctaSection p').textContent = checked ? 'Completá tus datos para recibir el resumen y los datos de pago.' : 'Marcá la confirmación arriba para habilitar el pago.';
-}
-
-let mailSent = false;
-function enviarMail() {
-  if (mailSent) return;
-  const name = document.getElementById('contactName').value.trim();
-  const email = document.getElementById('contactEmail').value.trim();
-  if (!name || !email) { alert('Completá tu nombre y email'); return; }
-  mailSent = true;
-  document.getElementById('sendBtn').textContent = '⏳ Enviando...';
-  document.getElementById('sendBtn').disabled = true;
-  const total = getTotal();
-  const rate = parseFloat(document.getElementById('usdRate').value) || 1410;
-  const hwARS = 40000;
-  const wMultiplier = warrantyMultiplier[warranty] || 1;
-  const trainingCost = training ? 45000 : 0;
-  const subtotal = (total + hwARS + trainingCost) * wMultiplier;
-  const mo = Math.round(subtotal * 0.3);
-  const envios = categories.filter(c => selected[c]).length * 8000;
-  const grandTotal = Math.round(subtotal + mo + envios);
-  const compsList = categories.map(c => { const i = comps[c]?.find(x => x.id === selected[c]); return i ? `${catLabels[c]}: ${i.name} (${fmt(i.price)})` : ''; }).filter(Boolean).join('\n');
-  const matName = questions.material.find(m=>m.id===answers.material)?.name || '-';
-  const sizeName = questions.size.find(s=>s.id===answers.size)?.name || '-';
-  const useName = questions.use.find(u=>u.id===answers.use)?.name || '-';
-  const entregaDir = document.getElementById('delivAddress').value || '—';
-  const entregaCiudad = document.getElementById('delivCity').value || '—';
-  const entregaTel = document.getElementById('delivPhone').value || '—';
-  const cuerpo = `Cliente: ${name}\nEmail: ${email}\n\nPerfil: ${matName} / ${sizeName} / ${useName}\n\nComponentes:\n${compsList}\nHardware: ${fmt(hwARS)}\nCurso CNC: ${training ? fmt(45000) : 'No'}\nGarantía: ${warranty === 'none' ? 'Sin garantía' : ({'6m':'6 meses','1y':'1 año','2y':'2 años'})[warranty]}\n\nSubtotal: ${fmt(subtotal)}\nMO (30%): ${fmt(mo)}\nEnvíos: ${fmt(envios)}\nTOTAL: ${fmt(grandTotal)} (USD ${Math.round(grandTotal/rate)})\n\nPago: ${paymentMethod}\nEntrega: ${deliveryMode === 'pickup' ? 'Retiro en taller' : 'Envío a domicilio'}\nDirección: ${entregaDir}\nCiudad: ${entregaCiudad}\nTeléfono: ${entregaTel}\nTiempo armado: ${getBuildTime()}`;
-  fetch('https://api.web3forms.com/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      access_key: '3c342011-0261-4815-ad59-073268662790',
-      subject: '🛠️ Nuevo presupuesto YMANAC CNC - ' + name,
-      name: name,
-      email: email,
-      message: cuerpo,
-      from_name: 'YMANAC CNC',
-      replyto: email
-    })
-  }).then(r => r.json()).then(() => {
-    document.getElementById('sendBtn').textContent = '✅ Enviado';
-    document.getElementById('mailStatus').style.display = 'block';
-  }).catch(() => {
-    document.getElementById('sendBtn').textContent = '❌ Error';
-    document.getElementById('sendBtn').disabled = false;
-    mailSent = false;
-    alert('Error al enviar. Probá de nuevo.');
-  });
-}
-
-function getBuildTime() {
-  const tiers = categories.map(c => { const i = comps[c]?.find(x => x.id === selected[c]); return i ? i.tier : 0; });
-  const avg = tiers.filter(t => t).reduce((a,b) => a+b, 0) / Math.max(1, tiers.filter(t => t).length);
-  if (avg <= 1.5) return '5-7 días hábiles';
-  if (avg <= 2.5) return '7-10 días hábiles';
-  if (avg <= 3.5) return '10-15 días hábiles';
-  if (avg <= 4.5) return '15-25 días hábiles';
-  return '25-40 días hábiles';
-}
-
-// Facebook share
-function compartirFacebook() {
-  const url = encodeURIComponent('https://ymanac-collab.github.io/ymanac-cnc/');
-  const texto = encodeURIComponent('🔥 YMANAC CNC — Armá tu máquina CNC a medida. Respondé preguntas y recibí tu presupuesto personalizado.');
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${texto}`, '_blank', 'width=600,height=400');
-}
-
-// Chat Assistant
-const chatFAQs = [
-  { q: '¿Qué materiales puedo trabajar?', r: 'Según el modelo, podés trabajar madera, acrílico, aluminio e incluso metales duros. Elegí tu material en el Paso 1 y la máquina se configura sola.' },
-  { q: '¿Cuánto tarda el armado?', r: 'Depende de la complejidad: desde 5 días para modelos básicos hasta 40 días para máquinas industriales. Lo calculamos automáticamente en el resumen.' },
-  { q: '¿Cómo es la garantía?', r: 'Ofrecemos 6 meses, 1 año o 2 años de garantía. También podés elegir sin garantía para ahorrar. Lo seleccionás en el resumen.' },
-  { q: '¿Cómo pago?', r: 'Aceptamos transferencia bancaria, MercadoPago, efectivo y cuotas sin interés. Elegí el método en el resumen.' },
-  { q: '¿Dan capacitación?', r: 'Sí, ofrecemos un curso básico de CNC como adicional. Incluye manejo del software, puesta a punto y primeros trabajos.' },
-  { q: '¿Hacen envíos?', r: 'Sí, hacemos envío a domicilio a todo el país. También podés retirar en nuestro taller.' },
-  { q: '¿Qué es el nivel T1-T5?', r: 'Es nuestra clasificación: T1 (Básico/Hobby) → T5 (Profesional/Industrial). A mayor nivel, mayor capacidad y precio.' },
-];
-document.getElementById('chatFAQs').innerHTML = chatFAQs.slice(0,4).map((f,i) => `<button class="chat-faq-btn" onclick="faqChat(${i})">${f.q}</button>`).join('');
-
-const SYSTEM_PROMPT = `Sos vendedor de YMANAC CNC (Argentina). Vendés máquinas CNC armadas a medida. Niveles: T1 Básico 🟢 (madera/hobby), T2 Taller 🟡, T3 Profesional 🟠 (aluminio), T4 Industrial 🔴, T5 Pesado 🟣 (metales). Componentes: motor, driver, fuente, transmisión, guías, estructura, spindle, controlador. Garantía hasta 2 años. Curso CNC $45.000 ARS. Envío a domicilio. Pago: transferencia, MP, efectivo, cuotas. Precios en ARS, ref dólar ~$1.410. MO 30%. Armado 5-40 días.
-
-Recomendá según material, presupuesto, uso y tamaño. Preguntá primero antes de recomendar. Siempre convencé: "en Argentina no hay nada comparable". Español argentino, cálido. No inventes precios ni componentes. Si dudás: "consultalo en el configurador".`;
-
-let chatHistory = [{ role: 'system', content: SYSTEM_PROMPT }];
-
-function toggleChat() {
-  const overlay = document.getElementById('chatOverlay');
-  const box = document.getElementById('chatBox');
-  overlay.classList.toggle('open');
-  box.classList.toggle('open');
-}
-
-function closeChat(e) {
-  if (e) e.stopPropagation();
-  const overlay = document.getElementById('chatOverlay');
-  const box = document.getElementById('chatBox');
-  overlay.classList.remove('open');
-  box.classList.remove('open');
-}
-
-const AI_API = 'https://text.pollinations.ai/openai/chat/completions';
-
-async function askAI(messages) {
-  const res = await fetch(AI_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'openai', messages })
-  });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const data = await res.json();
-  return data.choices[0].message.content;
-}
-
-function sendChat() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  addChatMsg(text, 'user');
-  input.value = '';
-  showTyping();
-  chatHistory.push({ role: 'user', content: text });
-  askAI(chatHistory)
-    .then(reply => {
-      hideTyping();
-      addChatMsg(reply, 'bot');
-      chatHistory.push({ role: 'assistant', content: reply });
-    })
-    .catch(err => {
-      hideTyping();
-      console.error('AI error:', err);
-      addChatMsg('🤖 Uy, hubo un error. ¿Podés intentar de nuevo? (Si persiste, escribinos a WhatsApp)', 'bot');
-    });
-}
-
-function faqChat(idx) {
-  const faq = chatFAQs[idx];
-  sendFaqText(faq.q);
-}
-
-function sendFaqText(text) {
-  addChatMsg(text, 'user');
-  showTyping();
-  chatHistory.push({ role: 'user', content: text });
-  askAI(chatHistory)
-    .then(reply => {
-      hideTyping();
-      addChatMsg(reply, 'bot');
-      chatHistory.push({ role: 'assistant', content: reply });
-    })
-    .catch(err => {
-      hideTyping();
-      console.error(err);
-      addChatMsg('🤖 Uy, hubo un error. ¿Podés intentar de nuevo? (Si persiste, escribinos a WhatsApp)', 'bot');
-    });
-}
-
-function resetChat() {
-  chatHistory = [{ role: 'system', content: SYSTEM_PROMPT }];
-  document.getElementById('chatMsgs').innerHTML = `
-    <div class="chat-msg bot">🤖 ¡Hola! Soy el asistente IA de YMANAC CNC. Preguntame lo que necesites: recomendación de máquina, componentes, precios, garantía, lo que sea. ¡Estoy acá para ayudarte!</div>
-  `;
-}
-
-function showTyping() {
-  const msgs = document.getElementById('chatMsgs');
-  const typing = document.createElement('div');
-  typing.className = 'chat-msg bot';
-  typing.id = 'typingIndicator';
-  typing.textContent = '🤖 Escribiendo...';
-  msgs.appendChild(typing);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function hideTyping() {
-  const el = document.getElementById('typingIndicator');
-  if (el) el.remove();
-}
-
-function addChatMsg(text, who) {
-  const msgs = document.getElementById('chatMsgs');
-  const div = document.createElement('div');
-  div.className = `chat-msg ${who}`;
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-</script>
+<a href="https://wa.me/5491128895177" target="_blank" class="whatsapp-float">💬</a>
 
 </body>
 </html>
